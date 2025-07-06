@@ -7,6 +7,8 @@ using UnityEngine;
 
 namespace Script.Module
 {
+    
+    
     // 管理插槽和模块的吸附
     public class ModuleSocket: MonoBehaviour
     {   
@@ -17,6 +19,13 @@ namespace Script.Module
         public void Attach(BaseModule attachedModule)
         {
             AttachedModule = attachedModule;
+            GetComponent<SocketSelector>().SetNormal();
+        }
+
+        public void Detach()
+        {
+            AttachedModule = null;
+            GetComponent<SocketSelector>().SetNormal();
         }
         
     }

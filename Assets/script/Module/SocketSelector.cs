@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Script.Module
 {
-    //负责在鼠标悬停 / 选中 / 普通状态之间切换插槽颜色。
+    //负责切换插槽颜色。
     [RequireComponent(typeof(ModuleSocket))]
     [RequireComponent(typeof(Renderer))]
     public class SocketSelector : MonoBehaviour
@@ -12,18 +12,21 @@ namespace Script.Module
         [Header("插槽状态颜色")] [SerializeField] private Color normalColor = Color.white;
         [SerializeField] private Color hoverColor = Color.yellow;
         [SerializeField] private Color pickedColor = Color.cyan;
-
+        [SerializeField] private Color attchedColor = Color.green;
+        [SerializeField] public ModuleSocket thisSocket;
         private Renderer _renderer;
 
         void Awake()
         {
             _renderer = GetComponent<Renderer>();
+            if (thisSocket == null){Debug.LogError("SocketSelector找不到引用");}
         }
 
         //设置不同颜色
         public void SetNormal()
         {
             _renderer.material.color = normalColor;
+            if (thisSocket.IsAttached){_renderer.material.color = attchedColor;}
         }
 
         public void SetHover()

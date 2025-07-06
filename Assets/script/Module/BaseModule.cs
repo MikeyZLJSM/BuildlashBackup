@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Script.Module.ModuleScript;
 using UnityEngine;
 
 namespace Script.Module
@@ -22,14 +23,13 @@ namespace Script.Module
         [SerializeField] [Header("模块插槽列表")] public List<ModuleSocket> socketsList = new List<ModuleSocket>();
 
         // 模块的物理碰撞体
-        protected Rigidbody _rb;
+        protected Rigidbody _rb => GetComponent<Rigidbody>();
 
         //添加插槽的方法
         protected abstract void CreateSockets();
 
         protected virtual void Awake()
         {
-            _rb = GetComponent<Rigidbody>();
             _rb.mass = moduleMass;
             _rb.interpolation = RigidbodyInterpolation.Interpolate;
 
@@ -45,7 +45,10 @@ namespace Script.Module
             if (parentSocket.IsAttached) return false;
             if (childSocket.IsAttached) return false;
             if (childModule == null) return false;
-
+            if (childModule.GetType() == typeof(BaseCube)) return false;
+            if (childModule.parentModule != null) return false;
+            if (socketsList.Contains(childSocket)) return false;
+            
             // 旋转对齐：让子插槽的forward方向与父插槽的forward方向完全相反
             Vector3 parentForward = parentSocket.transform.forward;
             
@@ -71,10 +74,23 @@ namespace Script.Module
 
             //关闭物理
             childModule.SetPhysicsAttached(true);
+            
+            FixedJoint joint = childModule.gameObject.AddComponent<FixedJoint>();
+            joint.connectedBody    = _rb;               // 父模块刚体
+            joint.breakForce       = Mathf.Infinity;    // 如需可破坏拼接，可设定阈值
+            joint.breakTorque      = Mathf.Infinity;
+            joint.enableCollision  = false;             // 若父子间不想互撞
+
+
 
             return true;
         }
 
+        public virtual void RemoveChildModule(BaseModule childModule)
+        {
+            RemoveChildModule(FindSocketAttachedToModule(childModule));
+        }
+        
         // 拆除子模块的方法
         public virtual void RemoveChildModule(ModuleSocket parentSideSocket)
         {
@@ -92,9 +108,16 @@ namespace Script.Module
             if (childSideSocket != null) childSideSocket.Attach(null);
 
             childModule.parentModule = null;
-
             // 恢复物理
-            childModule.SetPhysicsAttached(false); // 重新启用刚体
+
+            Destroy(childModule.GetComponent<FixedJoint>());
+            childModule.SetPhysicsAttached(false); 
+            childModule.GetComponent<Rigidbody>().AddForce(parentSideSocket.transform.forward * 10f, ForceMode.VelocityChange);
+            childModule.GetComponent<Rigidbody>().AddTorque(Random.onUnitSphere*10f,ForceMode.VelocityChange);
+            
+            
+            
+
         }
 
         public void SetPhysicsAttached(bool attached)
@@ -102,8 +125,8 @@ namespace Script.Module
             if (attached)
             {
                 // 禁用物理
-                _rb.isKinematic = true;
-                _rb.detectCollisions = false;
+                _rb.isKinematic = false;
+                _rb.detectCollisions = true;
             }
             else
             {

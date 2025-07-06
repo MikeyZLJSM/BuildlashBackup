@@ -7,9 +7,9 @@ using UnityEngine.UIElements;
 
 namespace Script.Module.ModuleScript
 {
-    // 立方体模块：在六个面各生成一个 ModuleSocket。
+    // 基础立方体模块
     [AddComponentMenu("Modules/CubeModule")]
-    public class CubeModule : BaseModule
+    public class BaseCube : BaseModule
     {   
         [Header("插槽间距")]
         private float gap = 0.1f;
