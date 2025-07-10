@@ -18,13 +18,11 @@ namespace Scripts.Module
     // 该类可以包含一些通用的功能或属性供子类使用
     public abstract class BaseModule : MonoBehaviour, IAttachable
     {
-        //TODO:枚举来代替string
+        //TODO:枚举来代替string,添加子模块
         [Header("模块名称")] public string moduleName; // 模块的名称
-
         [Header("模块质量")] public float moduleMass = 1f; // 模块的质量，默认值为1
-
-        // 父模块
         public BaseModule parentModule;
+        public BaseModule childModule;
 
         // 模块的插槽列表
         [SerializeField] [Header("模块插槽列表")] public List<ModuleSocket> socketsList = new List<ModuleSocket>();
@@ -165,20 +163,19 @@ namespace Scripts.Module
 
         public void SetPhysicsAttached(bool attached)
         {
+            //TODO:递归地把每一个子模块的物理属性重置一遍
             if(moduleName == "BaseCube")
                 return;
             
             if (attached)
             {
                 // 禁用物理
-                _rb.isKinematic = false;
-                _rb.detectCollisions = true;
+                _rb.isKinematic = true;
             }
             else
             {
                 // 恢复物理
                 _rb.isKinematic = false;
-                _rb.detectCollisions = true;
             }
         }
 
@@ -196,7 +193,7 @@ namespace Scripts.Module
             return null; // 如果没有找到，返回null
         }
 
-        // 默认实现：返回所有可拼接面的法线和中心点（立方体为例）
+        // 默认实现：返回所有可拼接面的法线和中心点（当前是立方体为例）
         public virtual (Vector3 normal, Vector3 center)[] GetAttachableFaces()
         {
             var box = GetComponent<BoxCollider>();

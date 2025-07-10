@@ -86,9 +86,10 @@ namespace Scripts.Module
                 {
                     if (TryClickModule(out BaseModule clickedModule))
                     {
-                        // 如果当前没有选中模块，则选中当前点击的模块
                         if (!IsModuleSelected)
                         {
+                            if(clickedModule.moduleName == "BaseCube")
+                                return;
                             SelectModule(clickedModule);
                         }
                         // 如果已经选中了一个模块，并且点击的是另一个模块，则尝试拼接
@@ -184,7 +185,6 @@ namespace Scripts.Module
             return module != null;
         }
 
-        // 选择模块
         public void SelectModule(BaseModule module)
         {
             _selectedModule = module;
@@ -192,7 +192,6 @@ namespace Scripts.Module
             Debug.Log($"选中模块: {_selectedModule.moduleName}");
         }
 
-        // 取消模块选择
         public void CancelModuleSelection()
         {
             _selectedModule = null;
