@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Scripts.Module
 {
+
     public class BuildController : MonoBehaviour
     {
         //实例化
@@ -15,6 +16,8 @@ namespace Scripts.Module
 
         public bool IsActive => _selectedChildSocket != null;
         private ModuleSocket _selectedChildSocket;
+        public bool IsModuleSelected => _selectedModule != null;
+        private BaseModule _selectedModule;
 
         void Awake()
         {
@@ -76,33 +79,31 @@ namespace Scripts.Module
                 {
                     if (TryClickModule(out BaseModule module))
                     {
-                        TryRemoveModule(module);
+                        TryRemoveModule(module, false);
                     }   
                 }
                 else
                 {
-                    // 尝试点击插槽
-                    if (TryClickSocket(out ModuleSocket clickedSocket))
+                    if (TryClickModule(out BaseModule clickedModule))
                     {
-                        // 如果已经选择了子插槽，且点击的是空的父插槽，则尝试拼接
-                        if (IsActive && !clickedSocket.IsAttached)
+                        // 如果当前没有选中模块，则选中当前点击的模块
+                        if (!IsModuleSelected)
                         {
-                            TryAssemble(clickedSocket);
+                            SelectModule(clickedModule);
                         }
-                        // 如果点击的是空的插槽，且没有选择子插槽，则选择为子插槽
-                        else if (!clickedSocket.IsAttached)
+                        // 如果已经选中了一个模块，并且点击的是另一个模块，则尝试拼接
+                        else if (_selectedModule != clickedModule)
                         {
-                            SelectChildSocket(clickedSocket);
+                            TryAssembleModule(_selectedModule, clickedModule);
                         }
-                    }  
+                    }
                 }
-
             }
 
             // 右键取消选择
             if (Input.GetMouseButtonDown(1))
             {
-                CancelSelection();
+                CancelModuleSelection();
             }
         }
     
@@ -130,20 +131,23 @@ namespace Scripts.Module
             }
         }
 
-        void TryRemoveModule(BaseModule module)
+        private void TryRemoveModule(BaseModule module)
         {
             if (module.parentModule == null) return;
-            
+
             BaseModule parentModule = module.parentModule;
+
+
             ModuleSocket parentSocket = parentModule.FindSocketAttachedToModule(module);
             ModuleSocket childSocket = module.FindSocketAttachedToModule(parentModule);
-            
-            
             parentModule.RemoveChildModule(module);
             parentSocket.Detach();
             childSocket.Detach();
-            
-            
+        }
+        
+        private void TryRemoveModule(BaseModule parentModule, bool socketJoint)
+        {
+            parentModule.RemoveChildModule(parentModule, socketJoint);
         }
         
         // 尝试点击插槽
@@ -169,7 +173,6 @@ namespace Scripts.Module
             print("尝试点击模块");
             module = null;
             
-            
             // 射线检测 Module 层
             if (!Physics.Raycast(gameCamera.ScreenPointToRay(Input.mousePosition),
                     out RaycastHit hit, 100f,
@@ -179,6 +182,56 @@ namespace Scripts.Module
             
             module = hit.collider.GetComponent<BaseModule>();
             return module != null;
+        }
+
+        // 选择模块
+        public void SelectModule(BaseModule module)
+        {
+            _selectedModule = module;
+            // 可在此处添加高亮或UI反馈
+            Debug.Log($"选中模块: {_selectedModule.moduleName}");
+        }
+
+        // 取消模块选择
+        public void CancelModuleSelection()
+        {
+            _selectedModule = null;
+            Debug.Log("取消模块选择");
+        }
+
+        // 模块对模块拼接（接支持所有实现 IAttachable 的模块）
+        private void TryAssembleModule(BaseModule fromModule, BaseModule toModule)
+        {
+            var fromAttach = fromModule as IAttachable;
+            var toAttach = toModule as IAttachable;
+            if (fromAttach != null && toAttach != null)
+            {
+                // 射线检测，获取父模块被点击的面
+                Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out RaycastHit hit, 100f, 1 << moduleLayer, QueryTriggerInteraction.Collide))
+                {
+                    Vector3 targetNormal = hit.normal; // 父模块被点击面的法线
+                    // 计算父模块被点击面的中心点
+                    var faces = toAttach.GetAttachableFaces();
+                    int bestIdx = 0;
+                    float bestDot = -1f;
+                    for (int i = 0; i < faces.Length; i++)
+                    {
+                        float dot = Vector3.Dot(faces[i].normal, targetNormal);
+                        if (dot > bestDot)
+                        {
+                            bestDot = dot;
+                            bestIdx = i;
+                        }
+                    }
+                    Vector3 targetFaceCenter = faces[bestIdx].center;
+                    bool ok = fromAttach.AttachToFace(toModule, targetNormal, targetFaceCenter, hit.point);
+                    if (ok)
+                    {
+                        CancelModuleSelection();
+                    }
+                }
+            }
         }
     }
 }
