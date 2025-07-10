@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
-using Script.Module.ModuleScript;
+using Scripts.Module.ModuleScript;
+using Scripts.Module.ModuleScript;
 using UnityEngine;
 
-namespace Script.Module
+namespace Scripts.Module
 {
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(SphereCollider))]
@@ -41,7 +42,6 @@ namespace Script.Module
             ModuleSocket parentSocket,
             ModuleSocket childSocket)
         {
-            // 
             if (parentSocket.IsAttached) return false;
             if (childSocket.IsAttached) return false;
             if (childModule == null) return false;

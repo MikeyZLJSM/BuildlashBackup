@@ -1,15 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Scripts.Module;
 using UnityEngine;
 
-using UnityEngine;
-using UnityEngine.UIElements;
-
-namespace Script.Module.ModuleScript
+namespace Scripts.Module.ModuleScript
 {
-    // 基础立方体模块
+    // 立方体模块：在六个面各生成一个 ModuleSocket。
     [AddComponentMenu("Modules/CubeModule")]
-    public class BaseCube : BaseModule
+    public class CubeModule : BaseModule
     {   
         [Header("插槽间距")]
         private float gap = 0.1f;

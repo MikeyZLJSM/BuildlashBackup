@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace script
+namespace Scripts
 {
     // 相机对准一个物体进行旋转和缩放
     public class CameraScript : MonoBehaviour

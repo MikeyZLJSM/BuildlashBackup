@@ -1,36 +1,33 @@
 ﻿// BuildController.cs
 using UnityEngine;
 
-namespace Script.Module
+namespace Scripts.Module
 {
-
     public class BuildController : MonoBehaviour
     {
-
         //实例化
         public static BuildController Instance;
+
+        [Header("游戏摄像头")] public Camera gameCamera;
         [SerializeField, Header("插槽的层级")] private int socketLayer = 8;
         [SerializeField, Header("模块的层级")] private int moduleLayer = 7;    
         [Header("删除键"), SerializeField] private KeyCode removeButton = KeyCode.E;
+
+        public bool IsActive => _selectedChildSocket != null;
+        private ModuleSocket _selectedChildSocket;
+
         void Awake()
         {
             if (Instance != null) Destroy(gameObject);
             Instance = this;
         }
+        
 
-        // 玩家是否选择了子插槽
-        public bool IsActive => _selectedChildSocket != null;
-
-        // 当前选中的子插槽
         public ModuleSocket CurrentChildSocket()
         {
             return _selectedChildSocket;
         }
-
-        // 当前选中的子插槽
-        private ModuleSocket _selectedChildSocket;
-
-        [Header("游戏摄像头")] public Camera gameCamera;
+        
 
         // 选择子插槽
         public void SelectChildSocket(ModuleSocket childSocket)

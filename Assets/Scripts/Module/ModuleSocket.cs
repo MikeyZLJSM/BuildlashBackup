@@ -5,10 +5,8 @@ using UnityEngine;
 
 
 
-namespace Script.Module
+namespace Scripts.Module
 {
-    
-    
     // 管理插槽和模块的吸附
     public class ModuleSocket: MonoBehaviour
     {   

@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace Script.Module
+namespace Scripts.Module
 {
     //负责切换插槽颜色。
     [RequireComponent(typeof(ModuleSocket))]
