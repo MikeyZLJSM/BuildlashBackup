@@ -101,7 +101,7 @@ namespace Scripts.Module
                 }
             }
             
-            if (Input.GetKeyDown(KeyCode.Backspace))
+            if (Input.GetKeyDown(KeyCode.C))
             {
                 CancelModuleSelection();
             }
