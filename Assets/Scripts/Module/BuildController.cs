@@ -100,9 +100,8 @@ namespace Scripts.Module
                     }
                 }
             }
-
-            // 右键取消选择
-            if (Input.GetMouseButtonDown(1))
+            
+            if (Input.GetKeyDown(KeyCode.Backspace))
             {
                 CancelModuleSelection();
             }
@@ -187,8 +186,8 @@ namespace Scripts.Module
 
         public void SelectModule(BaseModule module)
         {
+            //TODO：高亮显示选中模块
             _selectedModule = module;
-            // 可在此处添加高亮或UI反馈
             Debug.Log($"选中模块: {_selectedModule.moduleName}");
         }
 
@@ -205,7 +204,6 @@ namespace Scripts.Module
             var toAttach = toModule as IAttachable;
             if (fromAttach != null && toAttach != null)
             {
-                // 射线检测，获取父模块被点击的面
                 Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit, 100f, 1 << moduleLayer, QueryTriggerInteraction.Collide))
                 {

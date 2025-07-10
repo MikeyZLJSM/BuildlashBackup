@@ -193,7 +193,7 @@ namespace Scripts.Module
             return null; // 如果没有找到，返回null
         }
 
-        // 默认实现：返回所有可拼接面的法线和中心点（当前是立方体为例）
+        // 默认实现：返回所有可拼接面的法线和中心点（当前是立方体的默认实现）
         public virtual (Vector3 normal, Vector3 center)[] GetAttachableFaces()
         {
             var box = GetComponent<BoxCollider>();
@@ -211,10 +211,17 @@ namespace Scripts.Module
             };
         }
 
-        // 默认实现：面对面拼接
+        // 默认实现：面对面拼接（当前是立方体的默认实现）
         public virtual bool AttachToFace(BaseModule targetModule, Vector3 targetNormal, Vector3 targetFaceCenter, Vector3 hitPoint)
         {
             if(parentModule != null) return false;
+            
+            // 归一化旋转到最近的90度，防止受重力影响之后无法对齐拼接面
+            Vector3 euler = transform.rotation.eulerAngles;
+            euler.x = Mathf.Round(euler.x / 90f) * 90f;
+            euler.y = Mathf.Round(euler.y / 90f) * 90f;
+            euler.z = Mathf.Round(euler.z / 90f) * 90f;
+            transform.rotation = Quaternion.Euler(euler);
             
             // 1. 找到自身所有面，选最近的面
             var faces = GetAttachableFaces();
