@@ -1,21 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using Scripts.Module.ModuleScript;
-using Scripts.Module.ModuleScript;
 using UnityEngine;
 
 namespace Scripts.Module
 {
+    public interface IAttachable
+    {
+        bool AttachToFace(BaseModule targetModule, Vector3 targetNormal, Vector3 targetFaceCenter, Vector3 hitPoint);
+        // 返回所有可拼接面的法线和中心点
+        (Vector3 normal, Vector3 center)[] GetAttachableFaces();
+    }
+
     [RequireComponent(typeof(Rigidbody))]
     [RequireComponent(typeof(SphereCollider))]
     // 基础模块类，所有模块都应继承自此类
     // 该类可以包含一些通用的功能或属性供子类使用
-    public abstract class BaseModule : MonoBehaviour
+    public abstract class BaseModule : MonoBehaviour, IAttachable
     {
+        //TODO:枚举来代替string
         [Header("模块名称")] public string moduleName; // 模块的名称
 
         [Header("模块质量")] public float moduleMass = 1f; // 模块的质量，默认值为1
-
 
         // 父模块
         public BaseModule parentModule;
@@ -86,9 +92,23 @@ namespace Scripts.Module
             return true;
         }
 
-        public virtual void RemoveChildModule(BaseModule childModule)
+        // 虚方法：无插槽拼接，子类可重写
+        public virtual bool AttachChildModuleNoSocket(BaseModule childModule)
         {
-            RemoveChildModule(FindSocketAttachedToModule(childModule));
+            // 默认不支持无插槽拼接
+            return false;
+        }
+
+        public virtual void RemoveChildModule(BaseModule childModule, bool socketJoint = true)
+        {
+            if (socketJoint)
+            {
+                RemoveChildModule(FindSocketAttachedToModule(childModule));
+            }
+            else
+            {
+                RemoveChildModule();
+            }
         }
         
         // 拆除子模块的方法
@@ -114,14 +134,40 @@ namespace Scripts.Module
             childModule.SetPhysicsAttached(false); 
             childModule.GetComponent<Rigidbody>().AddForce(parentSideSocket.transform.forward * 10f, ForceMode.VelocityChange);
             childModule.GetComponent<Rigidbody>().AddTorque(Random.onUnitSphere*10f,ForceMode.VelocityChange);
-            
-            
-            
+        }
 
+        public virtual void RemoveChildModule()
+        {
+            if (parentModule == null) return;
+
+            // 断开父子关系
+            transform.SetParent(null, true);
+
+            // 置空父模块引用
+            parentModule = null;
+
+            // 移除 FixedJoint
+            var joint = GetComponent<FixedJoint>();
+            if (joint != null)
+                Destroy(joint);
+
+            // 恢复物理属性
+            SetPhysicsAttached(false);
+
+            // 弹开
+            var rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.AddForce(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
+                rb.AddTorque(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
+            }
         }
 
         public void SetPhysicsAttached(bool attached)
         {
+            if(moduleName == "BaseCube")
+                return;
+            
             if (attached)
             {
                 // 禁用物理
@@ -148,6 +194,68 @@ namespace Scripts.Module
             }
 
             return null; // 如果没有找到，返回null
+        }
+
+        // 默认实现：返回所有可拼接面的法线和中心点（立方体为例）
+        public virtual (Vector3 normal, Vector3 center)[] GetAttachableFaces()
+        {
+            var box = GetComponent<BoxCollider>();
+            if (box == null) return new (Vector3, Vector3)[0];
+            Vector3 center = transform.position;
+            Vector3 half = Vector3.Scale(box.size * 0.5f, transform.lossyScale);
+            return new (Vector3, Vector3)[]
+            {
+                (transform.right,   center + transform.right * half.x),
+                (-transform.right,  center - transform.right * half.x),
+                (transform.up,      center + transform.up * half.y),
+                (-transform.up,     center - transform.up * half.y),
+                (transform.forward, center + transform.forward * half.z),
+                (-transform.forward,center - transform.forward * half.z)
+            };
+        }
+
+        // 默认实现：面对面拼接
+        public virtual bool AttachToFace(BaseModule targetModule, Vector3 targetNormal, Vector3 targetFaceCenter, Vector3 hitPoint)
+        {
+            if(parentModule != null) return false;
+            
+            // 1. 找到自身所有面，选最近的面
+            var faces = GetAttachableFaces();
+            int minIdx = 0;
+            float minDist = float.MaxValue;
+            for (int i = 0; i < faces.Length; i++)
+            {
+                float dist = Vector3.Distance(faces[i].center, hitPoint);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    minIdx = i;
+                }
+            }
+            Vector3 selfNormal = faces[minIdx].normal;
+            Vector3 selfCenter = faces[minIdx].center;
+            // 2. 旋转自身，使该面法线与目标法线相反
+            Quaternion rotation = Quaternion.FromToRotation(selfNormal, -targetNormal);
+            transform.rotation = rotation * transform.rotation;
+            // 3. 旋转后重新计算该面中心
+            selfNormal = rotation * selfNormal;
+            selfCenter = transform.position + selfNormal * (selfCenter - transform.position).magnitude;
+            // 4. 平移自身，使该面中心与目标面中心重合
+            Vector3 offset = targetFaceCenter - selfCenter;
+            transform.position += offset;
+            // 5. 建立父子关系和物理连接
+            transform.SetParent(targetModule.transform, true);
+            parentModule = targetModule;
+            SetPhysicsAttached(true);
+            FixedJoint joint = gameObject.AddComponent<FixedJoint>();
+            joint.connectedBody = targetModule.GetComponent<Rigidbody>();
+            joint.breakForce = Mathf.Infinity;
+            joint.breakTorque = Mathf.Infinity;
+            joint.enableCollision = false;
+
+            SetPhysicsAttached(true);
+            
+            return true;
         }
     }
 }
