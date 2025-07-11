@@ -5,6 +5,15 @@ using UnityEngine;
 
 namespace Scripts.Module
 {
+    public enum ModuleType
+    {
+        BaseCube = 0,
+        Cube = 1,
+        Cylinder = 2,
+        Sphere = 3,
+        Cone = 4,
+    }
+    
     public interface IAttachable
     {
         bool AttachToFace(BaseModule targetModule, Vector3 targetNormal, Vector3 targetFaceCenter, Vector3 hitPoint);
@@ -19,10 +28,10 @@ namespace Scripts.Module
     public abstract class BaseModule : MonoBehaviour, IAttachable
     {
         //TODO:枚举来代替string,添加子模块
-        [Header("模块名称")] public string moduleName; // 模块的名称
-        [Header("模块质量")] public float moduleMass = 1f; // 模块的质量，默认值为1
+        public ModuleType moduleType;
+        public float moduleMass = 1f; 
         public BaseModule parentModule;
-        public BaseModule childModule;
+        public List<BaseModule> childModules = new List<BaseModule>();
 
         // 模块的插槽列表
         [SerializeField] [Header("模块插槽列表")] public List<ModuleSocket> socketsList = new List<ModuleSocket>();
@@ -138,6 +147,12 @@ namespace Scripts.Module
         {
             if (parentModule == null) return;
 
+            // 从父模块的子模块列表中移除自己
+            if (parentModule != null)
+            {
+                parentModule.RemoveChildModuleFromList(this);
+            }
+
             // 断开父子关系
             transform.SetParent(null, true);
 
@@ -161,10 +176,46 @@ namespace Scripts.Module
             }
         }
 
+        // 添加子模块到列表
+        public void AddChildModule(BaseModule childModule)
+        {
+            if (childModule != null && !childModules.Contains(childModule))
+            {
+                childModules.Add(childModule);
+            }
+        }
+
+        // 从列表中移除子模块
+        public void RemoveChildModuleFromList(BaseModule childModule)
+        {
+            if (childModules.Contains(childModule))
+            {
+                childModules.Remove(childModule);
+            }
+        }
+
+        // 获取当前模块的所有子模块
+        public List<BaseModule> GetAllChildModules()
+        {
+            return new List<BaseModule>(childModules);
+        }
+
+        // 获取所有子模块（递归，包括子模块的子模块）
+        public List<BaseModule> GetAllChildModulesRecursive()
+        {
+            List<BaseModule> allChildren = new List<BaseModule>();
+            foreach (var child in childModules)
+            {
+                allChildren.Add(child);
+                allChildren.AddRange(child.GetAllChildModulesRecursive());
+            }
+            return allChildren;
+        }
+
         public void SetPhysicsAttached(bool attached)
         {
             //TODO:递归地把每一个子模块的物理属性重置一遍
-            if(moduleName == "BaseCube")
+            if(moduleType == ModuleType.BaseCube)
                 return;
             
             if (attached)
@@ -250,6 +301,10 @@ namespace Scripts.Module
             // 5. 建立父子关系和物理连接
             transform.SetParent(targetModule.transform, true);
             parentModule = targetModule;
+            
+            // 6. 更新子模块关系
+            targetModule.AddChildModule(this);
+            
             SetPhysicsAttached(true);
             FixedJoint joint = gameObject.AddComponent<FixedJoint>();
             joint.connectedBody = targetModule.GetComponent<Rigidbody>();

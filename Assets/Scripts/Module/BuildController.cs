@@ -88,7 +88,7 @@ namespace Scripts.Module
                     {
                         if (!IsModuleSelected)
                         {
-                            if(clickedModule.moduleName == "BaseCube")
+                            if(clickedModule.moduleType == ModuleType.BaseCube)
                                 return;
                             SelectModule(clickedModule);
                         }
@@ -188,7 +188,7 @@ namespace Scripts.Module
         {
             //TODO：高亮显示选中模块
             _selectedModule = module;
-            Debug.Log($"选中模块: {_selectedModule.moduleName}");
+            Debug.Log($"选中模块: {_selectedModule.moduleType.ToString()}");
         }
 
         public void CancelModuleSelection()

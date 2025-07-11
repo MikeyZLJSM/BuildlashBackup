@@ -38,6 +38,7 @@ namespace Scripts.Module.ModuleScript
             
             _rb.isKinematic = true;
             _rb.detectCollisions = true;
+            moduleType = ModuleType.BaseCube;
         }
         
         protected override void CreateSockets()

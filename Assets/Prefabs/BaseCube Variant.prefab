@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4889693049574753983, guid: 6005763c854791a458c94ea8855fca89, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.2094874
+      value: 7.58
       objectReference: {fileID: 0}
     - target: {fileID: 4889693049574753983, guid: 6005763c854791a458c94ea8855fca89, type: 3}
       propertyPath: m_LocalPosition.z
@@ -64,6 +64,18 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 6743109109841607028, guid: 6005763c854791a458c94ea8855fca89, type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6743109109841607028, guid: 6005763c854791a458c94ea8855fca89, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9065312067907397683, guid: 6005763c854791a458c94ea8855fca89, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c43db5f98bfd6944c9644a030b7db37c, type: 2}
     m_RemovedComponents:
     - {fileID: -3127299948251990606, guid: 6005763c854791a458c94ea8855fca89, type: 3}
     m_RemovedGameObjects: []
@@ -90,9 +102,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30213895a55741e687b913abbd9d7628, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moduleName: BaseCube
-  moduleMass: 1
+  moduleType: 0
+  moduleMass: 0
   parentModule: {fileID: 0}
+  childModules: []
   socketsList: []
   socketOffset: -1
   socketRadius: 0.01

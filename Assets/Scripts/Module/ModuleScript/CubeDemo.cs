@@ -32,6 +32,12 @@ namespace Scripts.Module.ModuleScript
             (Vector3.left,   Vector3.up)       // 左
         };
         
+        protected override void Awake()
+        {
+            base.Awake();
+            moduleType = ModuleType.Cube;
+        }
+        
         protected override void CreateSockets()
         {
             // 计算插槽离中心的距离
