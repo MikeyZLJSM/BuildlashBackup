@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Scripts.Module.ModuleScript;
 using UnityEngine;
 
@@ -27,23 +28,21 @@ namespace Scripts.Module
     // 该类可以包含一些通用的功能或属性供子类使用
     public abstract class BaseModule : MonoBehaviour, IAttachable
     {
-        //TODO:枚举来代替string,添加子模块
         public ModuleType moduleType;
         public float moduleMass = 1f; 
         public BaseModule parentModule;
         public List<BaseModule> childModules = new List<BaseModule>();
 
+        protected Rigidbody _rb;
         // 模块的插槽列表
         [SerializeField] [Header("模块插槽列表")] public List<ModuleSocket> socketsList = new List<ModuleSocket>();
-
-        // 模块的物理碰撞体
-        protected Rigidbody _rb => GetComponent<Rigidbody>();
 
         //添加插槽的方法
         protected abstract void CreateSockets();
 
         protected virtual void Awake()
         {
+            _rb = GetComponent<Rigidbody>();
             _rb.mass = moduleMass;
             _rb.interpolation = RigidbodyInterpolation.Interpolate;
 
@@ -114,7 +113,7 @@ namespace Scripts.Module
             }
             else
             {
-                RemoveChildModule();
+                RemoveModule();
             }
         }
         
@@ -143,36 +142,26 @@ namespace Scripts.Module
             childModule.GetComponent<Rigidbody>().AddTorque(Random.onUnitSphere*10f,ForceMode.VelocityChange);
         }
 
-        public virtual void RemoveChildModule()
+        public virtual void RemoveModule()
         {
-            if (parentModule == null) return;
-
-            // 从父模块的子模块列表中移除自己
-            if (parentModule != null)
-            {
-                parentModule.RemoveChildModuleFromList(this);
-            }
-
-            // 断开父子关系
+            if (!parentModule) return;
+            
+            parentModule.RemoveChildModuleFromList(this);
             transform.SetParent(null, true);
-
-            // 置空父模块引用
             parentModule = null;
-
-            // 移除 FixedJoint
-            var joint = GetComponent<FixedJoint>();
-            if (joint != null)
-                Destroy(joint);
-
-            // 恢复物理属性
+            
+            // var joint = GetComponent<FixedJoint>();
+            // if (joint != null)
+            //     Destroy(joint);
+            
             SetPhysicsAttached(false);
-
-            // 弹开
-            var rb = GetComponent<Rigidbody>();
-            if (rb != null)
+            if (!_rb) return;
+            _rb.AddForce(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
+            _rb.AddTorque(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
+            
+            foreach (var child in childModules.ToList())
             {
-                rb.AddForce(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
-                rb.AddTorque(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
+                child.RemoveModule();
             }
         }
 
@@ -305,12 +294,13 @@ namespace Scripts.Module
             // 6. 更新子模块关系
             targetModule.AddChildModule(this);
             
+            //TODO: 建造阶段可以先不把刚体连接起来，等到游戏开始才连接刚体
             SetPhysicsAttached(true);
-            FixedJoint joint = gameObject.AddComponent<FixedJoint>();
-            joint.connectedBody = targetModule.GetComponent<Rigidbody>();
-            joint.breakForce = Mathf.Infinity;
-            joint.breakTorque = Mathf.Infinity;
-            joint.enableCollision = false;
+            // FixedJoint joint = gameObject.AddComponent<FixedJoint>();
+            // joint.connectedBody = targetModule.GetComponent<Rigidbody>();
+            // joint.breakForce = Mathf.Infinity;
+            // joint.breakTorque = Mathf.Infinity;
+            // joint.enableCollision = false;
 
             SetPhysicsAttached(true);
             
