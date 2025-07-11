@@ -16,8 +16,9 @@ namespace Scripts.Module
 
         public bool IsActive => _selectedChildSocket != null;
         private ModuleSocket _selectedChildSocket;
-        public bool IsModuleSelected => _selectedModule != null;
+        private bool _isModuleSelected => _selectedModule != null;
         private BaseModule _selectedModule;
+        private Color _originalColor;
 
         void Awake()
         {
@@ -86,24 +87,22 @@ namespace Scripts.Module
                 {
                     if (TryClickModule(out BaseModule clickedModule))
                     {
-                        if (!IsModuleSelected)
+                        if (!_isModuleSelected)
                         {
                             if(clickedModule.moduleType == ModuleType.BaseCube)
                                 return;
                             SelectModule(clickedModule);
                         }
-                        // 如果已经选中了一个模块，并且点击的是另一个模块，则尝试拼接
+                        else if (_isModuleSelected && clickedModule == _selectedModule)
+                        {
+                            CancelModuleSelection();
+                        }
                         else if (_selectedModule != clickedModule)
                         {
                             TryAssembleModule(_selectedModule, clickedModule);
                         }
                     }
                 }
-            }
-            
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                CancelModuleSelection();
             }
         }
     
@@ -184,15 +183,23 @@ namespace Scripts.Module
             return module != null;
         }
 
+        //TODO:封装所有的模块选择操作
         public void SelectModule(BaseModule module)
         {
             //TODO：高亮显示选中模块
-            _selectedModule = module;
+            _selectedModule = module; 
+            Material mat = module.GetComponent<Renderer>().material;
+            _originalColor = mat.color;
+            mat.color = Color.green;
             Debug.Log($"选中模块: {_selectedModule.moduleType.ToString()}");
         }
 
         public void CancelModuleSelection()
         {
+            if (_selectedModule)
+            {
+                _selectedModule.GetComponent<Renderer>().material.color = _originalColor;
+            }
             _selectedModule = null;
             Debug.Log("取消模块选择");
         }
@@ -200,6 +207,8 @@ namespace Scripts.Module
         // 模块对模块拼接（接支持所有实现 IAttachable 的模块）
         private void TryAssembleModule(BaseModule fromModule, BaseModule toModule)
         {
+            if(!toModule.parentModule && toModule.moduleType != ModuleType.BaseCube) return;
+            
             var fromAttach = fromModule as IAttachable;
             var toAttach = toModule as IAttachable;
             if (fromAttach != null && toAttach != null)
