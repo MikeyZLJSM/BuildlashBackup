@@ -12,7 +12,7 @@ namespace Scripts.Module
         [Header("游戏摄像头")] 
         public Camera gameCamera;
         
-        private ModuleSelector _moduleSelector;
+        [SerializeField] private ModuleSelector _moduleSelector;
         
         [SerializeField, Header("插槽的层级")] 
         private int socketLayer = 8;
@@ -29,8 +29,6 @@ namespace Scripts.Module
 
         private void Awake()
         {
-            _moduleSelector = ModuleSelector.Instance;
-            
             if (Instance != null) 
             {
                 Destroy(gameObject);

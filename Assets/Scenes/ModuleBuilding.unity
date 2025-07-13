@@ -280,6 +280,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameCamera: {fileID: 963194227}
+  _moduleSelector: {fileID: 613004743}
   socketLayer: 8
   moduleLayer: 7
   removeButton: 101
