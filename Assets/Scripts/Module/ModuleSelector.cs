@@ -8,11 +8,8 @@ namespace Scripts.Module
     /// </summary>
     public class ModuleSelector : MonoBehaviour
     {
-        public static ModuleSelector Instance;
-        
         [Header("模块选择设置")]
         [SerializeField] private Color selectedColor = Color.green;
-        [SerializeField] private Color normalColor = Color.white;
         
         // 事件：当模块选择状态改变时触发
         public event Action<BaseModule> OnModuleSelected;
@@ -24,16 +21,6 @@ namespace Scripts.Module
         
         public BaseModule SelectedModule => _selectedModule;
         public bool HasSelection => _selectedModule != null;
-        
-        private void Awake()
-        {
-            if (Instance != null) 
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
-        }
         
         private void SelectModule(BaseModule module)
         {
@@ -62,7 +49,6 @@ namespace Scripts.Module
             
             BaseModule previousModule = _selectedModule;
             
-            // 恢复原始颜色
             if (_selectedRenderer != null)
             {
                 _selectedRenderer.material.color = _originalColor;
@@ -92,31 +78,9 @@ namespace Scripts.Module
             }
         }
         
-        /// <summary>
-        /// 检查指定模块是否被选中
-        /// </summary>
-        /// <param name="module">要检查的模块</param>
-        /// <returns>是否被选中</returns>
         public bool IsModuleSelected(BaseModule module)
         {
             return _selectedModule == module;
-        }
-        
-        /// <summary>
-        /// 强制刷新选中模块的显示状态
-        /// </summary>
-        public void RefreshSelection()
-        {
-            if (_selectedModule != null && _selectedRenderer != null)
-            {
-                _selectedRenderer.material.color = selectedColor;
-            }
-        }
-        
-        public void SetSelectedColor(Color color)
-        {
-            selectedColor = color;
-            RefreshSelection();
         }
     }
 }
