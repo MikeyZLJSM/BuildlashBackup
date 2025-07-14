@@ -97,13 +97,7 @@ namespace Scripts.Module
 
             return true;
         }
-
-        // 虚方法：无插槽拼接，子类可重写
-        public virtual bool AttachChildModuleNoSocket(BaseModule childModule)
-        {
-            // 默认不支持无插槽拼接
-            return false;
-        }
+        
 
         public virtual void RemoveChildModule(BaseModule childModule, bool socketJoint = true)
         {
@@ -150,10 +144,6 @@ namespace Scripts.Module
             transform.SetParent(null, true);
             parentModule = null;
             
-            // var joint = GetComponent<FixedJoint>();
-            // if (joint != null)
-            //     Destroy(joint);
-            
             SetPhysicsAttached(false);
             if (!_rb) return;
             _rb.AddForce(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
@@ -164,17 +154,15 @@ namespace Scripts.Module
                 child.RemoveModule();
             }
         }
-
-        // 添加子模块到列表
-        public void AddChildModule(BaseModule childModule)
+        
+        public void AddChildModuleToList(BaseModule childModule)
         {
             if (childModule != null && !childModules.Contains(childModule))
             {
                 childModules.Add(childModule);
             }
         }
-
-        // 从列表中移除子模块
+        
         public void RemoveChildModuleFromList(BaseModule childModule)
         {
             if (childModules.Contains(childModule))
@@ -183,38 +171,17 @@ namespace Scripts.Module
             }
         }
 
-        // 获取当前模块的所有子模块
-        public List<BaseModule> GetAllChildModules()
-        {
-            return new List<BaseModule>(childModules);
-        }
-
-        // 获取所有子模块（递归，包括子模块的子模块）
-        public List<BaseModule> GetAllChildModulesRecursive()
-        {
-            List<BaseModule> allChildren = new List<BaseModule>();
-            foreach (var child in childModules)
-            {
-                allChildren.Add(child);
-                allChildren.AddRange(child.GetAllChildModulesRecursive());
-            }
-            return allChildren;
-        }
-
         public void SetPhysicsAttached(bool attached)
         {
-            //TODO:递归地把每一个子模块的物理属性重置一遍
             if(moduleType == ModuleType.BaseCube)
                 return;
             
             if (attached)
             {
-                // 禁用物理
                 _rb.isKinematic = true;
             }
             else
             {
-                // 恢复物理
                 _rb.isKinematic = false;
             }
         }
@@ -263,7 +230,7 @@ namespace Scripts.Module
             euler.z = Mathf.Round(euler.z / 90f) * 90f;
             transform.rotation = Quaternion.Euler(euler);
             
-            // 1. 找到自身所有面，选最近的面
+            // 1. 找到自身所有可拼接面，选最近的面
             var faces = GetAttachableFaces();
             int minIdx = 0;
             float minDist = float.MaxValue;
@@ -287,21 +254,13 @@ namespace Scripts.Module
             // 4. 平移自身，使该面中心与目标面中心重合
             Vector3 offset = targetFaceCenter - selfCenter;
             transform.position += offset;
-            // 5. 建立父子关系和物理连接
+            // 5. 建立父子关系
             transform.SetParent(targetModule.transform, true);
             parentModule = targetModule;
             
             // 6. 更新子模块关系
-            targetModule.AddChildModule(this);
+            targetModule.AddChildModuleToList(this);
             
-            //TODO: 建造阶段可以先不把刚体连接起来，等到游戏开始才连接刚体
-            SetPhysicsAttached(true);
-            // FixedJoint joint = gameObject.AddComponent<FixedJoint>();
-            // joint.connectedBody = targetModule.GetComponent<Rigidbody>();
-            // joint.breakForce = Mathf.Infinity;
-            // joint.breakTorque = Mathf.Infinity;
-            // joint.enableCollision = false;
-
             SetPhysicsAttached(true);
             
             return true;
