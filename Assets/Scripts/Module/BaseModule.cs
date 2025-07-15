@@ -166,6 +166,7 @@ namespace Scripts.Module
             
             foreach (var child in childModules.ToList())
             {
+                if (!child) continue;
                 child.RemoveModule();
             }
         }
