@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Scripts.Module;
@@ -75,6 +76,24 @@ namespace Scripts.Module.ModuleScript
                     }
                 }
             }
+        }
+
+        public override (Vector3 normal, Vector3 center, bool canAttach)[] GetAttachableFaces()
+        {
+            var box = GetComponent<BoxCollider>();
+            if(!box) return Array.Empty<(Vector3, Vector3, bool)>();
+            Vector3 center = transform.position;
+            Vector3 half = Vector3.Scale(box.size * 0.5f, transform.lossyScale);
+            
+            return new[]
+            {
+                (transform.right,   center + transform.right * half.x,   true),
+                (-transform.right,  center - transform.right * half.x,   true),
+                (transform.up,      center + transform.up * half.y,      true),
+                (-transform.up,     center - transform.up * half.y,      true),
+                (transform.forward, center + transform.forward * half.z, true),
+                (-transform.forward,center - transform.forward * half.z, true)
+            };
         }
     }
 }
