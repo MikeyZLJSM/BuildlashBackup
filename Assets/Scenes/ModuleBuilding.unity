@@ -311,7 +311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60c836de6ea81de418de9f2948db0508, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectedColor: {r: 0.9169811, g: 0.5487122, b: 0.11592023, a: 1}
+  selectedColor: {r: 0, g: 1, b: 0.11475754, a: 1}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

@@ -19,7 +19,7 @@ namespace Scripts.Module
     {
         bool AttachToFace(BaseModule targetModule, Vector3 targetNormal, Vector3 targetFaceCenter, Vector3 hitPoint);
         // 返回所有可拼接面的法线和中心点
-        (Vector3 normal, Vector3 center)[] GetAttachableFaces();
+        (Vector3 normal, Vector3 center, bool canAttach)[] GetAttachableFaces();
     }
 
     [RequireComponent(typeof(Rigidbody))]
@@ -32,8 +32,8 @@ namespace Scripts.Module
         public float moduleMass = 1f; 
         public BaseModule parentModule;
         public List<BaseModule> childModules = new List<BaseModule>();
-
         protected Rigidbody _rb;
+        
         // 模块的插槽列表
         [SerializeField] [Header("模块插槽列表")] public List<ModuleSocket> socketsList = new List<ModuleSocket>();
 
@@ -47,6 +47,21 @@ namespace Scripts.Module
             _rb.interpolation = RigidbodyInterpolation.Interpolate;
 
             CreateSockets();
+        }
+
+        public bool CanBeAttachedTarget()
+        {
+            if (moduleType == ModuleType.BaseCube)
+            {
+                return true;
+            }
+            
+            if (!parentModule)
+            {
+                return false;
+            }
+            
+            return parentModule.CanBeAttachedTarget();
         }
 
         // 添加子模块的方法
@@ -200,22 +215,11 @@ namespace Scripts.Module
             return null; // 如果没有找到，返回null
         }
 
-        // 默认实现：返回所有可拼接面的法线和中心点（当前是立方体的默认实现）
-        public virtual (Vector3 normal, Vector3 center)[] GetAttachableFaces()
+        // 返回所有可拼接面的法线和中心点,以及面是否可拼接
+        public virtual (Vector3 normal, Vector3 center, bool canAttach)[] GetAttachableFaces()
         {
-            var box = GetComponent<BoxCollider>();
-            if (box == null) return new (Vector3, Vector3)[0];
-            Vector3 center = transform.position;
-            Vector3 half = Vector3.Scale(box.size * 0.5f, transform.lossyScale);
-            return new (Vector3, Vector3)[]
-            {
-                (transform.right,   center + transform.right * half.x),
-                (-transform.right,  center - transform.right * half.x),
-                (transform.up,      center + transform.up * half.y),
-                (-transform.up,     center - transform.up * half.y),
-                (transform.forward, center + transform.forward * half.z),
-                (-transform.forward,center - transform.forward * half.z)
-            };
+            return new (Vector3 normal, Vector3 center, bool canAttach)[]
+            {};
         }
 
         // 默认实现：面对面拼接（当前是立方体的默认实现）
@@ -257,10 +261,7 @@ namespace Scripts.Module
             // 5. 建立父子关系
             transform.SetParent(targetModule.transform, true);
             parentModule = targetModule;
-            
-            // 6. 更新子模块关系
             targetModule.AddChildModuleToList(this);
-            
             SetPhysicsAttached(true);
             
             return true;
