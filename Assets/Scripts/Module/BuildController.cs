@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace Scripts.Module
 {
@@ -23,6 +24,11 @@ namespace Scripts.Module
         [Header("删除键"), SerializeField] 
         private KeyCode removeButton = KeyCode.E;
 
+        [Header("拼接预览")]
+        private GameObject _previewObject;
+        private Material _previewMaterial;
+        private bool _showingPreview = false;
+        
         // 插槽选择相关
         public bool IsActive => _selectedChildSocket != null;
         private ModuleSocket _selectedChildSocket;
@@ -37,6 +43,22 @@ namespace Scripts.Module
             Instance = this;
         }
 
+        private void Start()
+        {
+            _previewMaterial = new Material(Shader.Find("Standard"));
+            _previewMaterial.color = new Color(1, 1, 1, 0.5f); // 半透明白色
+            _previewMaterial.SetFloat("_Mode", 3); // 透明模式
+            _previewMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            _previewMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            _previewMaterial.SetInt("_ZWrite", 0);
+            _previewMaterial.DisableKeyword("_ALPHATEST_ON");
+            _previewMaterial.EnableKeyword("_ALPHABLEND_ON");
+            _previewMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            _previewMaterial.renderQueue = 3000;
+        }
+
+        #region sockets
+        
         public ModuleSocket CurrentChildSocket()
         {
             return _selectedChildSocket;
@@ -77,58 +99,6 @@ namespace Scripts.Module
 
             _selectedChildSocket = null;
             Debug.Log("取消插槽选择");
-        }
-
-        private void Update()
-        {
-            HandleMouseInput();
-        }
-
-        /// <summary>
-        /// 处理鼠标输入
-        /// </summary>
-        private void HandleMouseInput()
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                if (Input.GetKey(removeButton))
-                {
-                    // 删除模式
-                    HandleRemoveInput();
-                }
-                else
-                {
-                    // 正常建造模式
-                    HandleBuildInput();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 处理删除输入
-        /// </summary>
-        private void HandleRemoveInput()
-        {
-            if (TryClickModule(out BaseModule module))
-            {
-                RemoveModule(module);
-            }
-        }
-
-        /// <summary>
-        /// 处理建造输入
-        /// </summary>
-        private void HandleBuildInput()
-        {
-            if (TryClickModule(out BaseModule clickedModule))
-            {
-                _moduleSelector.ToggleModuleSelection(clickedModule);
-                
-                if (_moduleSelector.HasSelection)
-                {
-                    TryAssembleModule(_moduleSelector.SelectedModule, clickedModule);
-                }
-            }
         }
         
         private void TryAssemble(ModuleSocket parentSocket)
@@ -192,6 +162,83 @@ namespace Scripts.Module
             return socket != null;
         }
         
+        #endregion
+
+        private void Update()
+        {
+            HandleMouseInput();
+        }
+        
+        private void HandleMouseInput()
+        {
+            Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, 1000, 1 << moduleLayer))
+            {
+                if (_moduleSelector.SelectedModule && !Input.GetKey(removeButton))
+                {
+                    BaseModule targetModule = hit.collider.GetComponent<BaseModule>();
+                    if (targetModule)
+                    {
+                        if (targetModule != _moduleSelector.SelectedModule && targetModule.CanBeAttachedTarget())
+                        {
+                            TryPreviewAssemble(hit, targetModule);
+                        }
+                    }
+                }
+            }
+            else if (_showingPreview)
+            {
+                HidePreview();
+                _lastTargetNormal = Vector3.zero;
+                _lastTagetModule = null;
+            }
+            
+            if (Input.GetMouseButtonDown(0))
+            {
+                if (_showingPreview)
+                {
+                    CompleteAssemble();
+                }
+                else if (Input.GetKey(removeButton))
+                {
+                    // 删除模式
+                    HandleRemoveInput();
+                }
+                else
+                {
+                    // 正常建造模式
+                    HandleBuildInput();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 处理删除输入
+        /// </summary>
+        private void HandleRemoveInput()
+        {
+            if (TryClickModule(out BaseModule module))
+            {
+                RemoveModule(module);
+            }
+        }
+
+        /// <summary>
+        /// 处理建造输入
+        /// </summary>
+        private void HandleBuildInput()
+        {
+            if (TryClickModule(out BaseModule clickedModule))
+            {
+                _moduleSelector.ToggleModuleSelection(clickedModule);
+                
+                if (_moduleSelector.HasSelection)
+                {
+                    TryAssembleModule(_moduleSelector.SelectedModule, clickedModule);
+                }
+            }
+        }
+        
         private bool TryClickModule(out BaseModule module)
         {
             Debug.Log("尝试点击模块");
@@ -219,6 +266,67 @@ namespace Scripts.Module
             }
             
             targetModule.RemoveModule();
+        }
+
+        private Vector3 _lastTargetNormal;
+        private BaseModule _lastTagetModule;
+        private void CreateOrUpdatePreview(BaseModule sourceModule, BaseModule targetModule, Vector3 targetNormal,
+            Vector3 targetFaceCenter, Vector3 hitPoint)
+        {
+            if (targetNormal != _lastTargetNormal || (targetNormal == _lastTargetNormal && targetModule != _lastTagetModule))
+            {
+                _lastTagetModule = targetModule;
+                _lastTargetNormal = targetNormal;
+                HidePreview();
+            
+                _previewObject = Instantiate(sourceModule.gameObject);
+                BaseModule previewModule = _previewObject.GetComponent<BaseModule>();
+                previewModule.SetPhysicsAttached(true);
+            
+                // 应用半透明材质
+                Renderer[] renderers = _previewObject.GetComponentsInChildren<Renderer>();
+                foreach (var renderer in renderers)
+                {
+                    Material[] materials = new Material[renderer.materials.Length];
+                    for (int i = 0; i < materials.Length; i++)
+                    {
+                        materials[i] = _previewMaterial;
+                    }
+                    renderer.materials = materials;
+                }
+            
+                previewModule.AttachToFace(targetModule, targetNormal, targetFaceCenter, hitPoint);
+                previewModule.gameObject.layer = 0;
+                _showingPreview = true;
+            }
+        }
+        
+        // 隐藏预览
+        private void HidePreview()
+        {
+            if (_previewObject)
+            {
+                Debug.Log($"销毁预览{_previewObject.name}");
+                Destroy(_previewObject);
+                _previewObject = null;
+            }
+            _showingPreview = false;
+        }
+    
+        // 完成拼接
+        private void CompleteAssemble()
+        {
+            Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, 1 << moduleLayer, QueryTriggerInteraction.Collide))
+            {
+                BaseModule targetModule = hit.collider.GetComponent<BaseModule>();
+                if (targetModule != null && targetModule != _moduleSelector.SelectedModule)
+                {
+                    TryAssembleModule(_moduleSelector.SelectedModule, targetModule);
+                }
+            }
+        
+            HidePreview();
         }
 
         /// <summary>
@@ -264,6 +372,99 @@ namespace Scripts.Module
                     }
                 }
             }
+        }
+
+        // 查找目标模块上与射线命中点最匹配的可拼接面
+        private bool TryFindTargetAttachableFace(RaycastHit hit, BaseModule targetModule, 
+                                         out Vector3 targetFaceNormal, out Vector3 targetFaceCenter)
+        {
+            targetFaceNormal = Vector3.zero;
+            targetFaceCenter = Vector3.zero;
+                
+            var targetAttach = targetModule as IAttachable;
+            if (targetAttach == null)
+                return false;
+                
+            Vector3 hitNormal = hit.normal;
+            
+            // 获取目标模块的可拼接面
+            var targetFaces = targetAttach.GetAttachableFaces();
+            int bestTargetFaceIdx = -1;
+            float bestDot = -1f;
+            
+            // 找到最匹配的目标面
+            for (int i = 0; i < targetFaces.Length; i++)
+            {
+                if (!targetFaces[i].canAttach) continue;
+                float dot = Vector3.Dot(targetFaces[i].normal, hitNormal);
+                if (dot > bestDot)
+                {
+                    bestDot = dot;
+                    bestTargetFaceIdx = i;
+                }
+            }
+            
+            // 如果没找到可拼接面，返回失败
+            if (bestTargetFaceIdx < 0)
+                return false;
+                
+            // 返回找到的面信息
+            targetFaceNormal = targetFaces[bestTargetFaceIdx].normal;
+            targetFaceCenter = targetFaces[bestTargetFaceIdx].center;
+            return true;
+        }
+
+        // 查找选中模块上最适合与目标面拼接的面
+        private bool TryFindSourceAttachableFaceIndex(BaseModule selectedModule, Vector3 hitPoint)
+        {
+            var selectedAttach = selectedModule as IAttachable;
+            if (selectedAttach == null)
+                return false;
+                
+            // 获取选中模块的可拼接面
+            var selectedFaces = selectedAttach.GetAttachableFaces();
+            int bestSelectedFaceIdx = -1;
+            float minDist = float.MaxValue;
+            
+            // 找到最近的可拼接面
+            for (int i = 0; i < selectedFaces.Length; i++)
+            {
+                if (!selectedFaces[i].canAttach) continue;
+                float dist = Vector3.Distance(selectedFaces[i].center, hitPoint);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    bestSelectedFaceIdx = i;
+                }
+            }
+            
+            // 如果没找到可拼接面，返回失败
+            if (bestSelectedFaceIdx < 0)
+                return false;
+            
+            return true;
+        }
+        
+        // 预览拼接的主函数
+        private void TryPreviewAssemble(RaycastHit hit, BaseModule targetModule)
+        {
+            // 尝试找到目标可拼接面
+            if (TryFindTargetAttachableFace(hit, targetModule, out Vector3 targetFaceNormal,
+                    out Vector3 targetFaceCenter))
+            {
+                // 尝试找到源模块的最佳拼接面的下标
+                if (TryFindSourceAttachableFaceIndex(_moduleSelector.SelectedModule, hit.point))
+                {
+                    // 创建并且更新预览对象
+                    CreateOrUpdatePreview(_moduleSelector.SelectedModule, targetModule, targetFaceNormal, targetFaceCenter, hit.point);
+                    
+                    _showingPreview = true;
+                    return;
+                }
+            }
+
+            // 如果没有找到可拼接点，或者鼠标离开了模块，隐藏预览
+            HidePreview();
         }
     }
 }
