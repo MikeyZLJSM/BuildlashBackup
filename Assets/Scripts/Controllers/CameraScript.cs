@@ -1,45 +1,39 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Scripts
+// 相机对准一个物体进行旋转和缩放
+namespace Controllers
 {
-    // 相机对准一个物体进行旋转和缩放
     public class CameraScript : MonoBehaviour
     {
-        
-        [Header("围绕的物体")]
-        public Transform cenObj; //围绕的物体
-        [Header("旋转速度")]
-        public float rotationSpeed = 5f; //旋转速度
-        [Header("鼠标滚轮缩放速度")]
-        public float moveSpeed = 1f; //前后移动速度
-        
+        [Header("围绕的物体")] public Transform cenObj; //围绕的物体
+
+        [Header("旋转速度")] public float rotationSpeed = 5f; //旋转速度
+
+        [Header("鼠标滚轮缩放速度")] public float moveSpeed = 1f; //前后移动速度
+
         private Vector3 _rotionTransform;
         private new Camera camera;
-        void Start()
+
+        private void Start()
         {
             camera = GetComponent<Camera>();
             _rotionTransform = cenObj.position;
         }
-        void Update()
+
+        private void Update()
         {
             Ctrl_Cam_Move();
             Cam_Ctrl_Rotation();
             transform.LookAt(cenObj);
         }
+
         //镜头的远离和接近
         public void Ctrl_Cam_Move()
         {
-            if (Input.GetAxis("Mouse ScrollWheel") > 0)
-            {
-                transform.Translate(Vector3.forward * moveSpeed);//速度可调  自行调整
-            }
-            if (Input.GetAxis("Mouse ScrollWheel") < 0)
-            {
-                transform.Translate(Vector3.forward * -moveSpeed);//速度可调  自行调整
-            }
+            if (Input.GetAxis("Mouse ScrollWheel") > 0) transform.Translate(Vector3.forward * moveSpeed); //速度可调  自行调整
+            if (Input.GetAxis("Mouse ScrollWheel") < 0) transform.Translate(Vector3.forward * -moveSpeed); //速度可调  自行调整
         }
+
         //摄像机的旋转
         public void Cam_Ctrl_Rotation()
         {
@@ -51,6 +45,5 @@ namespace Scripts
                 transform.RotateAround(_rotionTransform, transform.right, mouse_y * rotationSpeed);
             }
         }
-    
     }
 }

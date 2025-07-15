@@ -260,6 +260,7 @@ GameObject:
   - component: {fileID: 613004742}
   - component: {fileID: 613004741}
   - component: {fileID: 613004743}
+  - component: {fileID: 613004744}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -281,9 +282,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameCamera: {fileID: 963194227}
   _moduleSelector: {fileID: 613004743}
-  socketLayer: 8
   moduleLayer: 7
   removeButton: 101
+  socketLayer: 8
 --- !u!4 &613004742
 Transform:
   m_ObjectHideFlags: 0
@@ -312,6 +313,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedColor: {r: 0.9169811, g: 0.5487122, b: 0.11592023, a: 1}
+--- !u!114 &613004744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 613004739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52ca52cdc403dfa4fa72217327e75236, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  centerModule: {fileID: 1247410866}
+  assembledModules: []
+  gridSize: 1
+  enableAttack: 1
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
+  globalAttackRange: 10
+  showDebugInfo: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,6 +601,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6005763c854791a458c94ea8855fca89, type: 3}
+--- !u!114 &1247410866 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1336865620609932398, guid: 69a1aabec93f25a49b7ee9c48c984885, type: 3}
+  m_PrefabInstance: {fileID: 1731430344353754522}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30213895a55741e687b913abbd9d7628, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1369560291
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -670,6 +703,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 765181c9ef4b24d32a4f7cbd2ef370dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _variables: {fileID: 0}
 --- !u!114 &1443128539
 MonoBehaviour:
   m_ObjectHideFlags: 0
