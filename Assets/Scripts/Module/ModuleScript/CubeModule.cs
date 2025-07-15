@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace Module.ModuleScript
 {
-    // 基础立方体模块
+    // 立方体模块：在六个面各生成一个 ModuleSocket。
     [AddComponentMenu("Modules/CubeModule")]
-    public class BaseCube : BaseModule
+    public class CubeModule : BaseModule
     {
         [Header("插槽距离中心的半边长。如果留空则自动根据Collider计算。")] [SerializeField]
         private float socketOffset = -1f; // -1 代表自动计算
@@ -30,10 +30,7 @@ namespace Module.ModuleScript
         protected override void Awake()
         {
             base.Awake();
-
-            _rb.isKinematic = true;
-            _rb.detectCollisions = true;
-            moduleType = ModuleType.BaseCube;
+            moduleType = ModuleType.Cube;
         }
 
         protected override void CreateSockets()

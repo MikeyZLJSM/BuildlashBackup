@@ -1,8 +1,9 @@
 ﻿// SocketSelector.cs
 
+using Module;
 using UnityEngine;
 
-namespace Scripts.Module
+namespace Controllers
 {
     //负责切换插槽颜色。
     [RequireComponent(typeof(ModuleSocket))]
@@ -16,17 +17,40 @@ namespace Scripts.Module
         [SerializeField] public ModuleSocket thisSocket;
         private Renderer _renderer;
 
-        void Awake()
+        private void Awake()
         {
             _renderer = GetComponent<Renderer>();
-            if (thisSocket == null){Debug.LogError("SocketSelector找不到引用");}
+            if (thisSocket == null) Debug.LogError("SocketSelector找不到引用");
+        }
+
+        //处理鼠标事件
+        private void OnMouseEnter()
+        {
+            // 如果当前插槽已被选中，保持选中颜色
+            if (BuildController.Instance.CurrentChildSocket() == GetSocket())
+            {
+                SetPicked();
+                return;
+            }
+
+            // 如果插槽未附加，显示悬停效果
+            if (!GetSocket().IsAttached) SetHover();
+        }
+
+        private void OnMouseExit()
+        {
+            // 若此插槽当前是 BuildController 的“正在高亮”则保持 picked 色
+            if (BuildController.Instance.CurrentChildSocket() == GetSocket())
+                SetPicked();
+            else
+                SetNormal();
         }
 
         //设置不同颜色
         public void SetNormal()
         {
             _renderer.material.color = normalColor;
-            if (thisSocket.IsAttached){_renderer.material.color = attchedColor;}
+            if (thisSocket.IsAttached) _renderer.material.color = attchedColor;
         }
 
         public void SetHover()
@@ -37,32 +61,6 @@ namespace Scripts.Module
         public void SetPicked()
         {
             _renderer.material.color = pickedColor;
-        }
-
-        //处理鼠标事件
-        void OnMouseEnter()
-        {
-            // 如果当前插槽已被选中，保持选中颜色
-            if (BuildController.Instance.CurrentChildSocket() == GetSocket())
-            {
-                SetPicked();
-                return;
-            }
-            
-            // 如果插槽未附加，显示悬停效果
-            if (!GetSocket().IsAttached)
-            {
-                SetHover();
-            }
-        }
-
-        void OnMouseExit()
-        {
-            // 若此插槽当前是 BuildController 的“正在高亮”则保持 picked 色
-            if (BuildController.Instance.CurrentChildSocket() == GetSocket())
-                SetPicked();
-            else
-                SetNormal();
         }
 
         /* ---------- 私有 ---------- */

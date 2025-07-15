@@ -1,15 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using Controllers;
 using UnityEngine;
 
-
-
-namespace Scripts.Module
+namespace Module
 {
     // 管理插槽和模块的吸附
-    public class ModuleSocket: MonoBehaviour
-    {   
+    public class ModuleSocket : MonoBehaviour
+    {
         public BaseModule parentModule; // 插槽所属的模块
         public BaseModule AttachedModule { get; private set; } // 附加的模块
         public bool IsAttached => AttachedModule != null; // 是否有附加模块
@@ -22,9 +18,7 @@ namespace Scripts.Module
 
         public void Detach()
         {
-            AttachedModule = null;
-            GetComponent<SocketSelector>().SetNormal();
+            Attach(null);
         }
-        
     }
 }

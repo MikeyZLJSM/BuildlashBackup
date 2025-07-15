@@ -103,3 +103,4 @@ InitTestScene*.unity*
 .idea
 .vs
 .vsconfig
+.github/copilot-instructions.md
