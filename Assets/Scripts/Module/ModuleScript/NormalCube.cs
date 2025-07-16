@@ -5,8 +5,8 @@ using UnityEngine;
 namespace Module.ModuleScript
 {
     // 立方体模块：在六个面各生成一个 ModuleSocket。
-    [AddComponentMenu("Modules/CubeModule")]
-    public class CubeModule : BaseModule
+    [AddComponentMenu("Modules/NormalCube")]
+    public class NormalCube : BaseModule
     {
         [Header("插槽距离中心的半边长。如果留空则自动根据Collider计算。")] [SerializeField]
         private float socketOffset = -1f; // -1 代表自动计算
@@ -31,7 +31,7 @@ namespace Module.ModuleScript
         protected override void Awake()
         {
             base.Awake();
-            moduleType = ModuleType.Cube;
+            moduleType = ModuleType.NormalCube;
         }
         
         protected override void CreateSockets()
