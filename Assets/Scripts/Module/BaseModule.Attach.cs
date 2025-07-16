@@ -101,7 +101,7 @@ namespace Module
             joint.enableCollision = false; // 若父子间不想互撞
 
             // 通知ScriptManager模块已拼接
-            if (ScriptManager.Instance != null) ScriptManager.Instance.OnModuleAttached(this, childModule);
+            if (ModulesManager.Instance != null) ModulesManager.Instance.OnModuleAttached(this, childModule);
 
             return true;
         }
@@ -174,7 +174,7 @@ namespace Module
             }
 
             // 通知ScriptManager模块已拆除
-            ScriptManager.Instance.OnModuleDetached(this);
+            ModulesManager.Instance.OnModuleDetached(this);
         }
 
         public void AddChildModuleToList(BaseModule childModule)
