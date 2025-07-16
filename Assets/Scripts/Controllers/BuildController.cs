@@ -182,6 +182,7 @@ namespace Controllers
                     BaseModule targetModule = hit.collider.GetComponent<BaseModule>();
                     
                     //若目前没有显示拼接预览，或者拼接预览有变动，则进入TryPreviewAssemble
+                    //TODO : 把这个弄成
                     if (!_showingPreview || ((_lastTagetModule != targetModule) || (_lastTagetModule == targetModule && _lastTargetNormal != hit.normal)))
                     {
                         if (!targetModule) return;
@@ -280,6 +281,11 @@ namespace Controllers
         private void CreateOrUpdatePreview(BaseModule sourceModule, BaseModule targetModule, Vector3 targetNormal,
             Vector3 targetFaceCenter, Vector3 hitPoint)
         {
+            if (_previewObject)
+            {
+                HidePreview();
+            }
+            
             if (targetModule == _lastTagetModule && targetNormal != _lastTargetNormal
                 || targetModule != _lastTagetModule && targetNormal == _lastTargetNormal)
             {
