@@ -11,7 +11,6 @@ using UnityEngine;
 namespace Module
 {
     [RequireComponent(typeof(Rigidbody))]
-    [RequireComponent(typeof(SphereCollider))]
     // 基础模块类，所有模块都应继承自此类
     // 该类可以包含一些通用的功能或属性供子类使用
     public abstract partial class BaseModule : MonoBehaviour, IAttachable

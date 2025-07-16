@@ -57,7 +57,7 @@ namespace Controllers
             SelectedModule = null;
             _selectedRenderer = null;
 
-            Debug.Log("取消模块选择");
+            //Debug.Log("取消模块选择");
 
             // 触发取消选择事件
             OnModuleDeselected?.Invoke(previousModule);

@@ -180,8 +180,11 @@ namespace Controllers
                 if (_moduleSelector.SelectedModule && !Input.GetKey(removeButton) && !_moduleSelector.SelectedModule.parentModule)
                 {
                     BaseModule targetModule = hit.collider.GetComponent<BaseModule>();
-                    if (targetModule)
+                    
+                    //若目前没有显示拼接预览，或者拼接预览有变动，则进入TryPreviewAssemble
+                    if (!_showingPreview || ((_lastTagetModule != targetModule) || (_lastTagetModule == targetModule && _lastTargetNormal != hit.normal)))
                     {
+                        if (!targetModule) return;
                         if (targetModule != _moduleSelector.SelectedModule && targetModule.CanBeAttachedTarget())
                         {
                             TryPreviewAssemble(hit, targetModule);
@@ -273,36 +276,39 @@ namespace Controllers
 
         private Vector3 _lastTargetNormal;
         private BaseModule _lastTagetModule;
+
         private void CreateOrUpdatePreview(BaseModule sourceModule, BaseModule targetModule, Vector3 targetNormal,
             Vector3 targetFaceCenter, Vector3 hitPoint)
         {
-            if (targetNormal != _lastTargetNormal || (targetNormal == _lastTargetNormal && targetModule != _lastTagetModule))
+            if (targetModule == _lastTagetModule && targetNormal != _lastTargetNormal
+                || targetModule != _lastTagetModule && targetNormal == _lastTargetNormal)
             {
-                _lastTagetModule = targetModule;
-                _lastTargetNormal = targetNormal;
                 HidePreview();
-            
-                _previewObject = Instantiate(sourceModule.gameObject);
-                BaseModule previewModule = _previewObject.GetComponent<BaseModule>();
-                previewModule.SetPhysicsAttached(true);
-            
-                // 应用半透明材质
-                Renderer[] renderers = _previewObject.GetComponentsInChildren<Renderer>();
-                foreach (var renderer in renderers)
-                {
-                    Material[] materials = new Material[renderer.materials.Length];
-                    for (int i = 0; i < materials.Length; i++)
-                    {
-                        materials[i] = _previewMaterial;
-                    }
-                    renderer.materials = materials;
-                }
-            
-                previewModule.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hitPoint);
-                Debug.Log($"预览拼接获得的参数：toModule:{targetModule.name}, targetNormal:{targetNormal. normalized}, targetFaceCenter:{targetFaceCenter}");
-                previewModule.gameObject.layer = 0;
-                _showingPreview = true;
             }
+            
+            _lastTagetModule = targetModule;
+            _lastTargetNormal = targetNormal;
+
+            _previewObject = Instantiate(sourceModule.gameObject);
+            BaseModule previewModule = _previewObject.GetComponent<BaseModule>();
+            previewModule.SetPhysicsAttached(true);
+
+            // 应用半透明材质
+            Renderer[] renderers = _previewObject.GetComponentsInChildren<Renderer>();
+            foreach (var renderer in renderers)
+            {
+                Material[] materials = new Material[renderer.materials.Length];
+                for (int i = 0; i < materials.Length; i++)
+                {
+                    materials[i] = _previewMaterial;
+                }
+
+                renderer.materials = materials;
+            }
+
+            previewModule.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hitPoint);
+            previewModule.gameObject.layer = 0;
+            _showingPreview = true;
         }
         
         // 隐藏预览
@@ -310,7 +316,6 @@ namespace Controllers
         {
             if (_previewObject)
             {
-                //Debug.Log($"销毁预览{_previewObject.name}");
                 Destroy(_previewObject);
                 _previewObject = null;
             }
@@ -347,56 +352,57 @@ namespace Controllers
                 {
                     Vector3 targetNormal = hit.normal; // 父模块被点击面的法线
                     var faces = targetToAttach.GetAttachableFaces();
-                    int bestIdx = FindBestAttachableFaceIndex(faces, targetNormal, true);
+                    
+                    bool hitIntoAttachableFace = false;
+                    foreach (var face in faces)
+                    {
+                        if(targetNormal != face.normal) continue;
+                        hitIntoAttachableFace = true;
+                        break;
+                    }
+                    if(hitIntoAttachableFace == false) return;
+                    
+                    int bestIdx = FindBestAttachableFaceIndex(faces, targetNormal, targetModule);
                     if (bestIdx < 0) return;
                     Vector3 targetFaceCenter = faces[bestIdx].center;
                     bool ok = fromAttach.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hit.point);
-                    Debug.Log($"正式拼接获得的参数：toModule:{targetModule.name}, targetNormal:{targetNormal}, targetFaceCenter:{targetFaceCenter}");
                     if (ok)
                     {
                         _moduleSelector.DeselectModule();
-                        Debug.Log("模块拼接成功!");
                     }
-                    else
-                    {
-                        Debug.Log("模块拼接失败!");
-                    }
+
                 }
             }
         }
-
-        /// <summary>
-        /// 在一组可拼接面中查找最佳匹配面下标
-        /// </summary>
-        /// <param name="faces">可拼接面数组</param>
-        /// <param name="target">目标向量（法线或点）</param>
-        /// <param name="useNormal">true:按法线相似度，false:按距离</param>
-        /// <returns>最佳匹配面下标，未找到返回-1</returns>
-        private int FindBestAttachableFaceIndex((Vector3 normal, Vector3 center, bool canAttach)[] faces, Vector3 target, bool useNormal)
+        
+        private int FindBestAttachableFaceIndex((Vector3 normal, Vector3 center, bool canAttach)[] faces,
+            Vector3 targetNormal, BaseModule targetModule)
         {
+            ModuleType targetType = targetModule.moduleType;
+
             int bestIdx = -1;
-            float bestValue = useNormal ? -1f : float.MaxValue;
-            for (int i = 0; i < faces.Length; i++)
+            float bestValue = -1f;
+            
+            switch (targetType)
             {
-                if (!faces[i].canAttach) continue;
-                float value = useNormal ? Vector3.Dot(faces[i].normal, target) : Vector3.Distance(faces[i].center, target);
-                if (useNormal)
-                {
-                    if (value > bestValue)
+                case ModuleType.BaseCube: 
+                case ModuleType.NormalCube:
+                case ModuleType.NormalCylinder:
+                    for (int i = 0; i < faces.Length; i++)
                     {
-                        bestValue = value;
-                        bestIdx = i;
+                        if (!faces[i].canAttach) continue;
+                        float value = Vector3.Dot(faces[i].normal, targetNormal);
+
+                        if (value > bestValue)
+                        {
+                            bestValue = value;
+                            bestIdx = i;
+                        }
                     }
-                }
-                else
-                {
-                    if (value < bestValue)
-                    {
-                        bestValue = value;
-                        bestIdx = i;
-                    }
-                }
+                    break;
+                
             }
+            
             return bestIdx;
         }
 
@@ -410,8 +416,20 @@ namespace Controllers
             if (targetAttach == null)
                 return false;
             Vector3 hitNormal = hit.normal;
+            
             var targetFaces = targetAttach.GetAttachableFaces();
-            int bestTargetFaceIdx = FindBestAttachableFaceIndex(targetFaces, hitNormal, true);
+            
+            //TODO:提取hit中指定面逻辑
+            bool hitIntoAttachableFace = false;
+            foreach (var face in targetFaces)
+            {
+                if(hitNormal != face.normal) continue;
+                hitIntoAttachableFace = true;
+                break;
+            }
+            if(hitIntoAttachableFace == false) return false;
+            
+            int bestTargetFaceIdx = FindBestAttachableFaceIndex(targetFaces, hitNormal, targetModule);
             if (bestTargetFaceIdx < 0)
                 return false;
             targetFaceNormal = targetFaces[bestTargetFaceIdx].normal;
@@ -426,13 +444,32 @@ namespace Controllers
             if (selectedAttach == null)
                 return false;
             var selectedFaces = selectedAttach.GetAttachableFaces();
-            int bestSelectedFaceIdx = FindBestAttachableFaceIndex(selectedFaces, hitPoint, false);
-            return bestSelectedFaceIdx >= 0;
+            int bestSelectedFaceIdx = -1;
+            float minDist = float.MaxValue;
+            
+            // 找到最近的可拼接面
+            for (int i = 0; i < selectedFaces.Length; i++)
+            {
+                if (!selectedFaces[i].canAttach) continue;
+                float dist = Vector3.Distance(selectedFaces[i].center, hitPoint);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    bestSelectedFaceIdx = i;
+                }
+            }
+            
+            // 如果没找到可拼接面，返回失败
+            if (bestSelectedFaceIdx < 0)
+                return false;
+            
+            return true;
         }
         
         // 预览拼接的主函数
         private void TryPreviewAssemble(RaycastHit hit, BaseModule targetModule)
         {
+            
             // 尝试找到目标可拼接面
             if (TryFindTargetAttachableFace(hit, targetModule, out Vector3 targetFaceNormal,
                     out Vector3 targetFaceCenter))
@@ -440,7 +477,7 @@ namespace Controllers
                 // 尝试找到源模块的最佳拼接面的下标
                 if (TryFindSourceAttachableFaceIndex(_moduleSelector.SelectedModule, hit.point))
                 {
-                    // 创建并且更新预览对象
+                    Debug.Log($"展示预览...");
                     CreateOrUpdatePreview(_moduleSelector.SelectedModule, targetModule, targetFaceNormal, targetFaceCenter, hit.point);
                     
                     _showingPreview = true;
