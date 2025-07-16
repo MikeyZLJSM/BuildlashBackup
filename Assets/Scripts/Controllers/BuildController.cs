@@ -244,7 +244,7 @@ namespace Controllers
         
         private bool TryClickModule(out BaseModule module)
         {
-            Debug.Log("尝试点击模块");
+            //Debug.Log("尝试点击模块");
             module = null;
             
             // 射线检测 Module 层
@@ -252,7 +252,7 @@ namespace Controllers
                     out RaycastHit hit, 100f,
                     1 << moduleLayer, QueryTriggerInteraction.Collide))
             {
-                Debug.Log("没有点击到模块!");
+                //Debug.Log("没有点击到模块!");
                 return false;
             }
             
@@ -298,7 +298,8 @@ namespace Controllers
                     renderer.materials = materials;
                 }
             
-                previewModule.AttachToFace(targetModule, targetNormal, targetFaceCenter, hitPoint);
+                previewModule.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hitPoint);
+                Debug.Log($"预览拼接获得的参数：toModule:{targetModule.name}, targetNormal:{targetNormal. normalized}, targetFaceCenter:{targetFaceCenter}");
                 previewModule.gameObject.layer = 0;
                 _showingPreview = true;
             }
@@ -309,7 +310,7 @@ namespace Controllers
         {
             if (_previewObject)
             {
-                Debug.Log($"销毁预览{_previewObject.name}");
+                //Debug.Log($"销毁预览{_previewObject.name}");
                 Destroy(_previewObject);
                 _previewObject = null;
             }
@@ -335,35 +336,22 @@ namespace Controllers
         /// <summary>
         /// 模块对模块拼接（支持所有实现 IAttachable 的模块）
         /// </summary>
-        private void TryAssembleModule(BaseModule fromModule, BaseModule toModule)
+        private void TryAssembleModule(BaseModule fromModule, BaseModule targetModule)
         {
-            if (toModule.moduleType != ModuleType.BaseCube && !toModule.parentModule) return; // 禁止单独的子模块拼接
+            if (targetModule.moduleType != ModuleType.BaseCube && !targetModule.parentModule) return; // 禁止单独的子模块拼接
             
-            if (fromModule is IAttachable fromAttach && toModule is IAttachable toAttach)
+            if (fromModule is IAttachable fromAttach && targetModule is IAttachable targetToAttach)
             {
                 Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
                 if (Physics.Raycast(ray, out RaycastHit hit, 100f, 1 << moduleLayer, QueryTriggerInteraction.Collide))
                 {
                     Vector3 targetNormal = hit.normal; // 父模块被点击面的法线
-                    
-                    // 计算父模块被点击面的中心点
-                    var faces = toAttach.GetAttachableFaces();
-                    int bestIdx = 0;
-                    float bestDot = -1f;
-                    
-                    for (int i = 0; i < faces.Length; i++)
-                    {
-                        float dot = Vector3.Dot(faces[i].normal, targetNormal);
-                        if (dot > bestDot)
-                        {
-                            bestDot = dot;
-                            bestIdx = i;
-                        }
-                    }
-                    
+                    var faces = targetToAttach.GetAttachableFaces();
+                    int bestIdx = FindBestAttachableFaceIndex(faces, targetNormal, true);
+                    if (bestIdx < 0) return;
                     Vector3 targetFaceCenter = faces[bestIdx].center;
-                    bool ok = fromAttach.AttachToFace(toModule, targetNormal, targetFaceCenter, hit.point);
-                    
+                    bool ok = fromAttach.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hit.point);
+                    Debug.Log($"正式拼接获得的参数：toModule:{targetModule.name}, targetNormal:{targetNormal}, targetFaceCenter:{targetFaceCenter}");
                     if (ok)
                     {
                         _moduleSelector.DeselectModule();
@@ -377,41 +365,55 @@ namespace Controllers
             }
         }
 
+        /// <summary>
+        /// 在一组可拼接面中查找最佳匹配面下标
+        /// </summary>
+        /// <param name="faces">可拼接面数组</param>
+        /// <param name="target">目标向量（法线或点）</param>
+        /// <param name="useNormal">true:按法线相似度，false:按距离</param>
+        /// <returns>最佳匹配面下标，未找到返回-1</returns>
+        private int FindBestAttachableFaceIndex((Vector3 normal, Vector3 center, bool canAttach)[] faces, Vector3 target, bool useNormal)
+        {
+            int bestIdx = -1;
+            float bestValue = useNormal ? -1f : float.MaxValue;
+            for (int i = 0; i < faces.Length; i++)
+            {
+                if (!faces[i].canAttach) continue;
+                float value = useNormal ? Vector3.Dot(faces[i].normal, target) : Vector3.Distance(faces[i].center, target);
+                if (useNormal)
+                {
+                    if (value > bestValue)
+                    {
+                        bestValue = value;
+                        bestIdx = i;
+                    }
+                }
+                else
+                {
+                    if (value < bestValue)
+                    {
+                        bestValue = value;
+                        bestIdx = i;
+                    }
+                }
+            }
+            return bestIdx;
+        }
+
         // 查找目标模块上与射线命中点最匹配的可拼接面
         private bool TryFindTargetAttachableFace(RaycastHit hit, BaseModule targetModule, 
                                          out Vector3 targetFaceNormal, out Vector3 targetFaceCenter)
         {
             targetFaceNormal = Vector3.zero;
             targetFaceCenter = Vector3.zero;
-                
             var targetAttach = targetModule as IAttachable;
             if (targetAttach == null)
                 return false;
-                
             Vector3 hitNormal = hit.normal;
-            
-            // 获取目标模块的可拼接面
             var targetFaces = targetAttach.GetAttachableFaces();
-            int bestTargetFaceIdx = -1;
-            float bestDot = -1f;
-            
-            // 找到最匹配的目标面
-            for (int i = 0; i < targetFaces.Length; i++)
-            {
-                if (!targetFaces[i].canAttach) continue;
-                float dot = Vector3.Dot(targetFaces[i].normal, hitNormal);
-                if (dot > bestDot)
-                {
-                    bestDot = dot;
-                    bestTargetFaceIdx = i;
-                }
-            }
-            
-            // 如果没找到可拼接面，返回失败
+            int bestTargetFaceIdx = FindBestAttachableFaceIndex(targetFaces, hitNormal, true);
             if (bestTargetFaceIdx < 0)
                 return false;
-                
-            // 返回找到的面信息
             targetFaceNormal = targetFaces[bestTargetFaceIdx].normal;
             targetFaceCenter = targetFaces[bestTargetFaceIdx].center;
             return true;
@@ -423,29 +425,9 @@ namespace Controllers
             var selectedAttach = selectedModule as IAttachable;
             if (selectedAttach == null)
                 return false;
-                
-            // 获取选中模块的可拼接面
             var selectedFaces = selectedAttach.GetAttachableFaces();
-            int bestSelectedFaceIdx = -1;
-            float minDist = float.MaxValue;
-            
-            // 找到最近的可拼接面
-            for (int i = 0; i < selectedFaces.Length; i++)
-            {
-                if (!selectedFaces[i].canAttach) continue;
-                float dist = Vector3.Distance(selectedFaces[i].center, hitPoint);
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                    bestSelectedFaceIdx = i;
-                }
-            }
-            
-            // 如果没找到可拼接面，返回失败
-            if (bestSelectedFaceIdx < 0)
-                return false;
-            
-            return true;
+            int bestSelectedFaceIdx = FindBestAttachableFaceIndex(selectedFaces, hitPoint, false);
+            return bestSelectedFaceIdx >= 0;
         }
         
         // 预览拼接的主函数
