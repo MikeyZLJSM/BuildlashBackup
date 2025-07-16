@@ -1,29 +1,22 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Scripts.Module;
+using Module.Enums;
 using UnityEngine;
 
-namespace Scripts.Module.ModuleScript
+namespace Module.ModuleScript
 {
     // 基础立方体模块
     [AddComponentMenu("Modules/CubeModule")]
     public class BaseCube : BaseModule
-    {   
-        [Header("插槽间距")]
-        private float gap = 0.1f;
-        
-        [Header("插槽距离中心的半边长。如果留空则自动根据Collider计算。")]
-        [SerializeField] private float socketOffset = -1f;          // -1 代表自动计算
+    {
+        [Header("插槽距离中心的半边长。如果留空则自动根据Collider计算。")] [SerializeField]
+        private float socketOffset = -1f; // -1 代表自动计算
 
-        [Tooltip("插槽碰撞球半径")]
-        [SerializeField] private float socketRadius = 0.01f;
+        [Tooltip("插槽碰撞球半径")] [SerializeField] private float socketRadius = 0.01f;
 
-        [Tooltip("插槽预制体")]
-        [SerializeField] private GameObject socketVisualPrefab;
+        [Tooltip("插槽预制体")] [SerializeField] private GameObject socketVisualPrefab;
 
         // 六个面：forward + up 配对
-        private (Vector3 forward, Vector3 up)[] faces = new (Vector3 forward, Vector3 up)[]
+        private readonly (Vector3 forward, Vector3 up)[] faces =
         {
             (Vector3.up,     Vector3.back),    // 上
             (Vector3.down,   Vector3.forward), // 下
@@ -32,7 +25,9 @@ namespace Scripts.Module.ModuleScript
             (Vector3.right,  Vector3.up),      // 右
             (Vector3.left,   Vector3.up)       // 左
         };
-        
+
+        [Header("插槽间距")] private readonly float gap = 0.1f;
+
         protected override void Awake()
         {
             base.Awake();

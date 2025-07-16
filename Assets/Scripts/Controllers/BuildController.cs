@@ -1,7 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
+using System;
+using Module;
+using Module.Enums;
+using Module.Interfaces;
 using UnityEngine;
 
-namespace Scripts.Module
+namespace Controllers
 {
     /// <summary>
     /// 建造控制器，专注于模块的拼接和拆除逻辑
@@ -10,9 +14,8 @@ namespace Scripts.Module
     {
         public static BuildController Instance;
 
-        [Header("游戏摄像头")] 
-        public Camera gameCamera;
-        
+        [Header("游戏摄像头")] public Camera gameCamera;
+
         [SerializeField] private ModuleSelector _moduleSelector;
         
         [SerializeField, Header("插槽的层级")] 
