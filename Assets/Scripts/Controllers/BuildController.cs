@@ -177,7 +177,7 @@ namespace Controllers
             Ray ray = gameCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 1000, 1 << moduleLayer))
             {
-                if (_moduleSelector.SelectedModule && !Input.GetKey(removeButton))
+                if (_moduleSelector.SelectedModule && !Input.GetKey(removeButton) && !_moduleSelector.SelectedModule.parentModule)
                 {
                     BaseModule targetModule = hit.collider.GetComponent<BaseModule>();
                     if (targetModule)
