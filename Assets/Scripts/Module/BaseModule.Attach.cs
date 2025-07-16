@@ -19,13 +19,14 @@ namespace Module
         public ModuleType moduleType;
         public float moduleMass = 1f;
         public BaseModule parentModule;
-
-        public List<BaseModule> childModules = new();
+        public List<BaseModule> childModules = new List<BaseModule>();
+        protected Rigidbody _rb;
 
         // 模块的插槽列表
         [SerializeField] [Header("模块插槽列表")] public List<ModuleSocket> socketsList = new();
 
-        protected Rigidbody _rb;
+        //添加插槽的方法
+        protected abstract void CreateSockets();
 
         protected virtual void Awake()
         {
@@ -36,91 +37,22 @@ namespace Module
             CreateSockets();
         }
 
-        // 默认实现：返回所有可拼接面的法线和中心点（当前是立方体的默认实现）
-        public virtual (Vector3 normal, Vector3 center)[] GetAttachableFaces()
+        public bool CanBeAttachedTarget()
         {
-            var box = GetComponent<BoxCollider>();
-            if (box == null) return new (Vector3, Vector3)[0];
-            var center = transform.position;
-            var half = Vector3.Scale(box.size * 0.5f, transform.lossyScale);
-            return new[]
+            if (moduleType == ModuleType.BaseCube)
             {
-                (transform.right, center + transform.right * half.x),
-                (-transform.right, center - transform.right * half.x),
-                (transform.up, center + transform.up * half.y),
-                (-transform.up, center - transform.up * half.y),
-                (transform.forward, center + transform.forward * half.z),
-                (-transform.forward, center - transform.forward * half.z)
-            };
-        }
-
-        // 默认实现：面对面拼接（当前是立方体的默认实现）
-        public virtual bool AttachToFace(BaseModule targetModule, Vector3 targetNormal, Vector3 targetFaceCenter,
-            Vector3 hitPoint)
-        {
-            if (parentModule != null) return false;
-
-            // 归一化旋转到最近的90度，防止受重力影响之后无法对齐拼接面
-            var euler = transform.rotation.eulerAngles;
-            euler.x = Mathf.Round(euler.x / 90f) * 90f;
-            euler.y = Mathf.Round(euler.y / 90f) * 90f;
-            euler.z = Mathf.Round(euler.z / 90f) * 90f;
-            transform.rotation = Quaternion.Euler(euler);
-
-            // 1. 找到自身所有面，选最近的面
-            var faces = GetAttachableFaces();
-            var minIdx = 0;
-            var minDist = float.MaxValue;
-            for (var i = 0; i < faces.Length; i++)
-            {
-                var dist = Vector3.Distance(faces[i].center, hitPoint);
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                    minIdx = i;
-                }
+                return true;
             }
 
-            var selfNormal = faces[minIdx].normal;
-            var selfCenter = faces[minIdx].center;
-            // 2. 旋转自身，使该面法线与目标法线相反
-            var rotation = Quaternion.FromToRotation(selfNormal, -targetNormal);
-            transform.rotation = rotation * transform.rotation;
-            // 3. 旋转后重新计算该面中心
-            selfNormal = rotation * selfNormal;
-            selfCenter = transform.position + selfNormal * (selfCenter - transform.position).magnitude;
-            // 4. 平移自身，使该面中心与目标面中心重合
-            var offset = targetFaceCenter - selfCenter;
-            transform.position += offset;
-            // 5. 建立父子关系和物理连接
-            transform.SetParent(targetModule.transform, true);
-            parentModule = targetModule;
+            if (!parentModule)
+            {
+                return false;
+            }
 
-            // 6. 更新子模块关系
-            targetModule.AddChildModule(this);
-
-            // 通知ScriptManager模块已拼接
-            if (ScriptManager.Instance != null) ScriptManager.Instance.OnModuleAttached(targetModule, this);
-
-            //TODO: 建造阶段可以先不把刚体连接起来，等到游戏开始才连接刚体
-            SetPhysicsAttached(true);
-            // FixedJoint joint = gameObject.AddComponent<FixedJoint>();
-            // joint.connectedBody = targetModule.GetComponent<Rigidbody>();
-            // joint.breakForce = Mathf.Infinity;
-            // joint.breakTorque = Mathf.Infinity;
-            // joint.enableCollision = false;
-
-            SetPhysicsAttached(true);
-
-            return true;
+            return parentModule.CanBeAttachedTarget();
         }
 
-        //添加插槽的方法
-        protected abstract void CreateSockets();
-    
-        //<summary>
-        /// 添加子模块的方法（插槽实现）
-        // </summary>
+        // 添加子模块的方法
         public virtual bool AttachChildModule(BaseModule childModule,
             ModuleSocket parentSocket,
             ModuleSocket childSocket)
@@ -157,7 +89,7 @@ namespace Module
             childModule.parentModule = this;
 
             // 添加到子模块列表
-            AddChildModule(childModule);
+            AddChildModuleToList(childModule);
 
             //关闭物理
             childModule.SetPhysicsAttached(true);
@@ -181,33 +113,31 @@ namespace Module
             return false;
         }
 
-
-        // <summary>
-        /// （插槽方法，未使用）
-        // </summary>
         public virtual void RemoveChildModule(BaseModule childModule, bool socketJoint = true)
         {
             if (socketJoint)
+            {
                 RemoveChildModule(FindSocketAttachedToModule(childModule));
+            }
             else
+            {
                 RemoveModule();
+            }
         }
 
-        // <summary>
         // 拆除子模块的方法
-        // </summary>
         public virtual void RemoveChildModule(ModuleSocket parentSideSocket)
         {
             if (parentSideSocket == null || !parentSideSocket.IsAttached) return;
 
-            var childModule = parentSideSocket.AttachedModule;
+            BaseModule childModule = parentSideSocket.AttachedModule;
 
             //断层级
             childModule.transform.SetParent(null, true); // 脱出父层级，保留世界位置
 
             // 置空插槽
             parentSideSocket.Attach(null); // 父端插槽置空
-            var childSideSocket = childModule.FindSocketAttachedToModule(this);
+            ModuleSocket childSideSocket = childModule.FindSocketAttachedToModule(this);
             if (childSideSocket != null) childSideSocket.Attach(null);
 
             childModule.parentModule = null;
@@ -224,10 +154,6 @@ namespace Module
             childModule.GetComponent<Rigidbody>().AddTorque(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
         }
 
-        
-        // <summary>
-        /// 移除当前模块（包括所有子模块）
-        // </summary>
         public virtual void RemoveModule()
         {
             if (!parentModule) return;
@@ -236,74 +162,118 @@ namespace Module
             transform.SetParent(null, true);
             parentModule = null;
 
-            // var joint = GetComponent<FixedJoint>();
-            // if (joint != null)
-            //     Destroy(joint);
-
             SetPhysicsAttached(false);
             if (!_rb) return;
             _rb.AddForce(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
             _rb.AddTorque(Random.onUnitSphere * 10f, ForceMode.VelocityChange);
-            
-            // 通知ScriptManager模块已拆除
-            ScriptManager.Instance.OnModuleDetached(this);
 
-            foreach (var child in childModules.ToList()) child.RemoveModule();
-        }
-
-        // 添加子模块到列表
-        public void AddChildModule(BaseModule childModule)
-        {
-            if (childModule != null && !childModules.Contains(childModule)) childModules.Add(childModule);
-        }
-
-        // 从列表中移除子模块
-        public void RemoveChildModuleFromList(BaseModule childModule)
-        {
-            if (childModules.Contains(childModule)) childModules.Remove(childModule);
-        }
-
-        // 获取当前模块的所有子模块
-        public List<BaseModule> GetAllChildModules()
-        {
-            return new List<BaseModule>(childModules);
-        }
-
-        // 获取所有子模块（递归，包括子模块的子模块）
-        public List<BaseModule> GetAllChildModulesRecursive()
-        {
-            var allChildren = new List<BaseModule>();
-            foreach (var child in childModules)
+            foreach (var child in childModules.ToList())
             {
-                allChildren.Add(child);
-                allChildren.AddRange(child.GetAllChildModulesRecursive());
+                if (!child) continue;
+                child.RemoveModule();
             }
 
-            return allChildren;
+            // 通知ScriptManager模块已拆除
+            ScriptManager.Instance.OnModuleDetached(this);
+        }
+
+        public void AddChildModuleToList(BaseModule childModule)
+        {
+            if (childModule != null && !childModules.Contains(childModule))
+            {
+                childModules.Add(childModule);
+            }
+        }
+
+        public void RemoveChildModuleFromList(BaseModule childModule)
+        {
+            if (childModules.Contains(childModule))
+            {
+                childModules.Remove(childModule);
+            }
         }
 
         public void SetPhysicsAttached(bool attached)
         {
-            //TODO:递归地把每一个子模块的物理属性重置一遍
             if (moduleType == ModuleType.BaseCube)
                 return;
 
             if (attached)
-                // 禁用物理
+            {
                 _rb.isKinematic = true;
+            }
             else
-                // 恢复物理
+            {
                 _rb.isKinematic = false;
+            }
         }
 
         // 查找附加到指定子模块的插槽
         public ModuleSocket FindSocketAttachedToModule(BaseModule targetChildModule)
         {
-            foreach (var moduleSocket in socketsList)
+            foreach (ModuleSocket moduleSocket in socketsList)
+            {
                 if (moduleSocket.AttachedModule == targetChildModule)
+                {
                     return moduleSocket; // 返回找到的插槽
+                }
+            }
 
             return null; // 如果没有找到，返回null
+        }
+
+        // 返回所有可拼接面的法线和中心点,以及面是否可拼接
+        public virtual (Vector3 normal, Vector3 center, bool canAttach)[] GetAttachableFaces()
+        {
+            return new (Vector3 normal, Vector3 center, bool canAttach)[]
+                { };
+        }
+
+        // 默认实现：面对面拼接（当前是立方体的默认实现）
+        public virtual bool AttachToFace(BaseModule targetModule, Vector3 targetNormal, Vector3 targetFaceCenter,
+            Vector3 hitPoint)
+        {
+            if (parentModule != null) return false;
+
+            // 归一化旋转到最近的90度，防止受重力影响之后无法对齐拼接面
+            Vector3 euler = transform.rotation.eulerAngles;
+            euler.x = Mathf.Round(euler.x / 90f) * 90f;
+            euler.y = Mathf.Round(euler.y / 90f) * 90f;
+            euler.z = Mathf.Round(euler.z / 90f) * 90f;
+            transform.rotation = Quaternion.Euler(euler);
+
+            // 1. 找到自身所有可拼接面，选最近的面
+            var faces = GetAttachableFaces();
+            int minIdx = 0;
+            float minDist = float.MaxValue;
+            for (int i = 0; i < faces.Length; i++)
+            {
+                float dist = Vector3.Distance(faces[i].center, hitPoint);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    minIdx = i;
+                }
+            }
+
+            Vector3 selfNormal = faces[minIdx].normal;
+            Vector3 selfCenter = faces[minIdx].center;
+            // 2. 旋转自身，使该面法线与目标法线相反
+            Quaternion rotation = Quaternion.FromToRotation(selfNormal, -targetNormal);
+            transform.rotation = rotation * transform.rotation;
+            // 3. 旋转后重新计算该面中心
+            selfNormal = rotation * selfNormal;
+            selfCenter = transform.position + selfNormal * (selfCenter - transform.position).magnitude;
+            // 4. 平移自身，使该面中心与目标面中心重合
+            Vector3 offset = targetFaceCenter - selfCenter;
+            transform.position += offset;
+            // 5. 建立父子关系
+            transform.SetParent(targetModule.transform, true);
+            parentModule = targetModule;
+            targetModule.AddChildModuleToList(this);
+            SetPhysicsAttached(true);
+
+            return true;
         }
     }
 }

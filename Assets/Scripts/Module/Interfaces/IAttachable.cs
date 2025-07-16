@@ -7,6 +7,6 @@ namespace Module.Interfaces
         bool AttachToFace(BaseModule targetModule, Vector3 targetNormal, Vector3 targetFaceCenter, Vector3 hitPoint);
 
         // 返回所有可拼接面的法线和中心点
-        (Vector3 normal, Vector3 center)[] GetAttachableFaces();
+        (Vector3 normal, Vector3 center, bool canAttach)[] GetAttachableFaces();
     }
 }
