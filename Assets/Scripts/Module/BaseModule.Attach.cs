@@ -282,6 +282,12 @@ namespace Module
             targetModule.AddChildModuleToList(this);
             SetPhysicsAttached(true);
 
+            // 6. 通知ModulesManager模块已拼接
+            if (!isPreview && ModulesManager.Instance != null)
+            {
+                ModulesManager.Instance.OnModuleAttached(targetModule, this);
+            }
+
             // if (!isPreview)
             // {
             //     SetAttachableFaces(minIdx); 
