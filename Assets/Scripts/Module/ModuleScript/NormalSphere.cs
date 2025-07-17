@@ -4,22 +4,21 @@ using System.Collections.Generic;
 using Module.Enums;
 using UnityEngine;
 
-
 namespace Module.ModuleScript
 {
-    public class NormalCylinder : BaseModule
+    public class NormalSphere : BaseModule
     {
         protected override void CreateSockets()
         {
         }
-        
+
         private BoxCollider _collider;
 
         protected override void Awake()
         {
             base.Awake();
             _collider = GetComponent<BoxCollider>();
-            moduleType = ModuleType.NormalCylinder;
+            moduleType = ModuleType.NormalSphere;
         }
 
         public override (Vector3 normal, Vector3 center, bool canAttach)[] GetAttachableFaces()
@@ -35,11 +34,8 @@ namespace Module.ModuleScript
 
             return new[]
             {
-                (up, center + transform.up * half.y, true),
                 (-up, center - transform.up * half.y, true),
             };
         }
-        
     }
 }
-

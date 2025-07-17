@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Module.ModuleScript
 {
-    public class NormalCylinder : BaseModule
+    public class NormalCone : BaseModule
     {
         protected override void CreateSockets()
         {
@@ -35,11 +35,9 @@ namespace Module.ModuleScript
 
             return new[]
             {
-                (up, center + transform.up * half.y, true),
                 (-up, center - transform.up * half.y, true),
             };
         }
         
     }
 }
-
