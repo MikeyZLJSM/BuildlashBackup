@@ -242,6 +242,8 @@ namespace Module
         {
             if (parentModule) return false;
 
+            Debug.Log($"拼接到目标 模块：{targetModule.name} ，法向量{targetNormal} ，中心点{targetFaceCenter} ，射线检测点{hitPoint}");
+            
             // 归一化旋转到最近的90度，防止受重力影响之后无法对齐拼接面
             Vector3 euler = transform.rotation.eulerAngles;
             euler.x = Mathf.Round(euler.x / 90f) * 90f;
