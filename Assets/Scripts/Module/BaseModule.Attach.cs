@@ -19,6 +19,7 @@ namespace Module
         public float moduleMass = 1f;
         public BaseModule parentModule;
         public List<BaseModule> childModules = new List<BaseModule>();
+        protected (Vector3 normal, Vector3 center, bool canAttach)[] _attachableFaces;
         protected Rigidbody _rb;
 
         // 模块的插槽列表
@@ -227,12 +228,19 @@ namespace Module
             return new (Vector3 normal, Vector3 center, bool canAttach)[]
                 { };
         }
+        protected virtual void SetAttachableFaces(int faceIndex)
+        {
+            if (_attachableFaces != null)
+            {
+                _attachableFaces[faceIndex].canAttach = false;
+            }
+        }
 
         // 默认实现：面对面拼接（当前是立方体的默认实现）
         public virtual bool AttachToFace(BaseModule targetModule, Vector3 targetNormal, Vector3 targetFaceCenter,
-            Vector3 hitPoint)
+            Vector3 hitPoint, bool isPreview = false)
         {
-            if (parentModule != null) return false;
+            if (parentModule) return false;
 
             // 归一化旋转到最近的90度，防止受重力影响之后无法对齐拼接面
             Vector3 euler = transform.rotation.eulerAngles;
@@ -272,6 +280,11 @@ namespace Module
             targetModule.AddChildModuleToList(this);
             SetPhysicsAttached(true);
 
+            // if (!isPreview)
+            // {
+            //     SetAttachableFaces(minIdx); 
+            // }
+            
             return true;
         }
     }

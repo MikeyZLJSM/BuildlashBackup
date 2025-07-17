@@ -39,8 +39,6 @@ namespace Controllers
                 _selectedRenderer.material.color = selectedColor;
             }
 
-            Debug.Log($"选中模块: {SelectedModule.moduleType}");
-
             // 触发选择事件
             OnModuleSelected?.Invoke(SelectedModule);
         }

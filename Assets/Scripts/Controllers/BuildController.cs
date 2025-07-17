@@ -312,7 +312,7 @@ namespace Controllers
                 renderer.materials = materials;
             }
 
-            previewModule.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hitPoint);
+            previewModule.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hitPoint, true);
             previewModule.gameObject.layer = 0;
             _showingPreview = true;
         }
@@ -344,6 +344,25 @@ namespace Controllers
             HidePreview();
         }
 
+        
+        //第一版检测选中面是否可拼接：利用法向量检测射线命中的面是否对应模块上可拼接面
+        //后续如果一个面上有多个可拼接区域，可以用faces元组的center来判断该面上的不同区域
+        private bool IsHitFaceAttachable(Vector3 hitNormal, (Vector3 normal, Vector3 center, bool canAttach)[] faces)
+        {
+            bool hitIntoAttachableFace = false;
+
+            foreach (var face in faces)
+            {
+                if (hitNormal == face.normal)
+                {
+                    hitIntoAttachableFace = true;
+                    break;
+                }
+            }
+
+            return hitIntoAttachableFace;
+        }
+
         /// <summary>
         /// 模块对模块拼接（支持所有实现 IAttachable 的模块）
         /// </summary>
@@ -357,16 +376,10 @@ namespace Controllers
                 if (Physics.Raycast(ray, out RaycastHit hit, 100f, 1 << moduleLayer, QueryTriggerInteraction.Collide))
                 {
                     Vector3 targetNormal = hit.normal; // 父模块被点击面的法线
+                    
                     var faces = targetToAttach.GetAttachableFaces();
                     
-                    bool hitIntoAttachableFace = false;
-                    foreach (var face in faces)
-                    {
-                        if(targetNormal != face.normal) continue;
-                        hitIntoAttachableFace = true;
-                        break;
-                    }
-                    if(hitIntoAttachableFace == false) return;
+                    if(IsHitFaceAttachable(hit.normal, faces) == false) return;
                     
                     int bestIdx = FindBestAttachableFaceIndex(faces, targetNormal, targetModule);
                     if (bestIdx < 0) return;
@@ -425,15 +438,7 @@ namespace Controllers
             
             var targetFaces = targetAttach.GetAttachableFaces();
             
-            //TODO:提取hit中指定面逻辑
-            bool hitIntoAttachableFace = false;
-            foreach (var face in targetFaces)
-            {
-                if(hitNormal != face.normal) continue;
-                hitIntoAttachableFace = true;
-                break;
-            }
-            if(hitIntoAttachableFace == false) return false;
+            if(IsHitFaceAttachable(hit.normal, targetFaces) == false) return false;
             
             int bestTargetFaceIdx = FindBestAttachableFaceIndex(targetFaces, hitNormal, targetModule);
             if (bestTargetFaceIdx < 0)
