@@ -2878,7 +2878,6 @@ MonoBehaviour:
   moduleMass: 1
   parentModule: {fileID: 0}
   childModules: []
-  socketsList: []
 --- !u!65 &4635523925510286883
 BoxCollider:
   m_ObjectHideFlags: 0
