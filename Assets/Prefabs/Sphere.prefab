@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 3837126844823592794}
   - component: {fileID: 3859187185080475563}
   - component: {fileID: 8986541986375415057}
-  - component: {fileID: 2952077166596336504}
   - component: {fileID: 1736253339684992409}
-  - component: {fileID: 3996435190713418460}
   - component: {fileID: 2148941568991527526}
+  - component: {fileID: 2239400478020525095}
+  - component: {fileID: 3996435190713418460}
   m_Layer: 7
   m_Name: Sphere
   m_TagString: Untagged
@@ -8636,28 +8636,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 852446051139500092}
   m_Mesh: {fileID: 0}
---- !u!64 &2952077166596336504
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 852446051139500092}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
 --- !u!54 &1736253339684992409
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8685,23 +8663,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &3996435190713418460
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 852446051139500092}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7f36a6fcfca28142aa3d34bf4708b32, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moduleType: 0
-  moduleMass: 1
-  parentModule: {fileID: 0}
-  childModules: []
-  socketsList: []
 --- !u!65 &2148941568991527526
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8723,3 +8684,40 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!135 &2239400478020525095
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852446051139500092}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3996435190713418460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 852446051139500092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7f36a6fcfca28142aa3d34bf4708b32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moduleType: 0
+  moduleMass: 1
+  parentModule: {fileID: 0}
+  childModules: []

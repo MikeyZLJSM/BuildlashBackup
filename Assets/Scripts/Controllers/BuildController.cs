@@ -31,10 +31,6 @@ namespace Controllers
         private GameObject _previewObject;
         private Material _previewMaterial;
         private bool _showingPreview = false;
-        
-        // 插槽选择相关
-        public bool IsActive => _selectedChildSocket != null;
-        private ModuleSocket _selectedChildSocket;
 
         private void Awake()
         {
@@ -59,114 +55,7 @@ namespace Controllers
             _previewMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
             _previewMaterial.renderQueue = 3000;
         }
-
-        #region sockets
         
-        public ModuleSocket CurrentChildSocket()
-        {
-            return _selectedChildSocket;
-        }
-        
-        public void SelectChildSocket(ModuleSocket childSocket)
-        {
-            if (childSocket == null || childSocket.IsAttached) return;
-
-            // 如果之前已经选择了插槽，先取消高亮
-            if (_selectedChildSocket != null)
-            {
-                var prevSelector = _selectedChildSocket.GetComponent<SocketSelector>();
-                if (prevSelector != null)
-                    prevSelector.SetNormal();
-            }
-
-            _selectedChildSocket = childSocket;
-
-            // 高亮当前选中的插槽
-            var socketSelector = _selectedChildSocket.GetComponent<SocketSelector>();
-            if (socketSelector != null)
-            {
-                socketSelector.SetPicked();
-            }
-
-            Debug.Log("选中子插槽: " + _selectedChildSocket.name);
-        }
-        
-        public void CancelSocketSelection()
-        {
-            if (_selectedChildSocket != null)
-            {
-                var socketSelector = _selectedChildSocket.GetComponent<SocketSelector>();
-                if (socketSelector != null)
-                    socketSelector.SetNormal();
-            }
-
-            _selectedChildSocket = null;
-            Debug.Log("取消插槽选择");
-        }
-        
-        private void TryAssemble(ModuleSocket parentSocket)
-        {
-            // 父插槽必须空
-            if (parentSocket.IsAttached) return;
-            if (_selectedChildSocket == null) return;
-
-            // 尝试链接
-            bool ok = parentSocket.parentModule
-                .AttachChildModule(_selectedChildSocket.parentModule, parentSocket, _selectedChildSocket);
-
-            // 如果拼装成功
-            if (ok)
-            {
-                Debug.Log("拼接成功!");
-                CancelSocketSelection();
-                // 取消模块选择
-                _moduleSelector.DeselectModule();
-                // 更新父插槽颜色
-                parentSocket.GetComponent<SocketSelector>().SetNormal();
-            }
-            else
-            {
-                Debug.Log("拼接失败!");
-            }
-        }
-
-        /// <summary>
-        /// 拆除模块（插槽连接方式）
-        /// </summary>
-        private void TryRemoveModule(BaseModule module)
-        {
-            if (module.parentModule == null) return;
-
-            BaseModule parentModule = module.parentModule;
-            ModuleSocket parentSocket = parentModule.FindSocketAttachedToModule(module);
-            ModuleSocket childSocket = module.FindSocketAttachedToModule(parentModule);
-            
-            parentModule.RemoveChildModule(module);
-            parentSocket.Detach();
-            childSocket.Detach();
-        }
-        
-        private bool TryClickSocket(out ModuleSocket socket)
-        {
-            Debug.Log("尝试点击插槽...");
-            socket = null;
-
-            // 射线检测 Socket 层
-            if (!Physics.Raycast(gameCamera.ScreenPointToRay(Input.mousePosition),
-                    out RaycastHit hit, 100f,
-                    1 << socketLayer, QueryTriggerInteraction.Collide))
-            {
-                Debug.Log("没有点击到插槽!");
-                return false;
-            }
-
-            // 尝试取出组件
-            socket = hit.collider.GetComponent<ModuleSocket>();
-            return socket != null;
-        }
-        
-        #endregion
-
         private void Update()
         {
             HandleMouseInput();
