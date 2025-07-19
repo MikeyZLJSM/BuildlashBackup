@@ -263,6 +263,8 @@ namespace Module
 
         private void SetAllFacesDetach()
         {
+            if(moduleType == ModuleType.BaseCube) return;
+            
             if (_attachableFaces != null)
             {
                 foreach (var face in _attachableFaces)
