@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Module.Enums;
 using UnityEngine;
+using Module.Interfaces;
 
 namespace Module.ModuleScript
 {
@@ -14,21 +15,16 @@ namespace Module.ModuleScript
             moduleType = ModuleType.NormalSphere;
         }
 
-        public override (Vector3 normal, Vector3 center, bool canAttach)[] GetAttachableFaces()
+        public override ModuleFace[] GetAttachableFaces()
         {
-            if (!_faceDetectCollider)
-            {
-                Debug.LogError("碰撞体为空");
-                return Array.Empty<(Vector3, Vector3, bool)>();
-            }
-            Vector3 center = transform.position;
-            Vector3 up = transform.up.normalized;
-            Vector3 half = Vector3.Scale(_faceDetectCollider.size * 0.5f, transform.lossyScale);
-
-            return new[]
-            {
-                (-up, center - transform.up * half.y, true),
-            };
+            Vector3 localSize = _faceDetectCollider.size;
+            Vector3 localExtents = localSize * 0.5f;
+    
+            _attachableFaces = new ModuleFace[1];
+            
+            _attachableFaces[0] = new ModuleFace(Vector3.down, new Vector3(0, -localExtents.y, 0), true, this);
+    
+            return _attachableFaces;
         }
     }
 }
