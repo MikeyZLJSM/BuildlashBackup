@@ -6,6 +6,6 @@
         NormalCube = 1,
         NormalCylinder = 2,
         NormalSphere = 3,
-        Cone = 4
+        NormalCone = 4
     }
 }

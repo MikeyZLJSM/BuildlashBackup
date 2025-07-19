@@ -75,7 +75,7 @@ namespace Controllers
                     if (!_showingPreview || ((_lastTagetModule != targetModule) || (_lastTagetModule == targetModule && _lastTargetNormal != hit.normal)))
                     {
                         if (!targetModule) return;
-                        if (targetModule != _moduleSelector.SelectedModule && targetModule.CanBeAttachedTarget())
+                        if (targetModule != _moduleSelector.SelectedModule && targetModule.CanBeAttachedTarget_r())
                         {
                             TryPreviewAssemble(hit, targetModule);
                         }
@@ -202,6 +202,7 @@ namespace Controllers
             }
 
             previewModule.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hitPoint, true);
+            //Debug.Log($"预览结果参数：目标模块：{targetModule.name}，法向量：{targetNormal.normalized}，中心点：{targetFaceCenter}，射线检测点：{hitPoint}");
             previewModule.gameObject.layer = 0;
             _showingPreview = true;
         }
@@ -236,15 +237,16 @@ namespace Controllers
         
         //第一版检测选中面是否可拼接：利用法向量检测射线命中的面是否对应模块上可拼接面
         //后续如果一个面上有多个可拼接区域，可以用faces元组的center来判断该面上的不同区域
-        private bool IsHitFaceAttachable(Vector3 hitNormal, (Vector3 normal, Vector3 center, bool canAttach)[] faces)
+        private bool IsHitFaceAttachable(Vector3 hitNormal, ModuleFace[] faces)
         {
             bool hitIntoAttachableFace = false;
-
-            foreach (var face in faces)
+            
+            for (int i = 0; i < faces.Length; i++)
             {
-                if (hitNormal == face.normal)
+                if (hitNormal == faces[i].Normal && faces[i].CanAttach)
                 {
                     hitIntoAttachableFace = true;
+                    Debug.Log($"命中可拼接面：{faces[i].Normal} , 下标：{i}");
                     break;
                 }
             }
@@ -266,14 +268,15 @@ namespace Controllers
                 {
                     Vector3 targetNormal = hit.normal; // 父模块被点击面的法线
                     
-                    var faces = targetToAttach.GetAttachableFaces();
+                    var faces = targetModule._attachableFaces;
                     
-                    if(IsHitFaceAttachable(hit.normal, faces) == false) return;
+                    if(!IsHitFaceAttachable(hit.normal, faces)) return;
                     
-                    int bestIdx = FindBestAttachableFaceIndex(faces, targetNormal, targetModule);
+                    int bestIdx = FindBestAttachableFaceIndex(faces, targetNormal);
                     if (bestIdx < 0) return;
-                    Vector3 targetFaceCenter = faces[bestIdx].center;
+                    Vector3 targetFaceCenter = faces[bestIdx].Center;
                     bool ok = fromAttach.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hit.point);
+                    //Debug.Log($"拼接结果参数：目标模块：{targetModule.name}，法向量：{targetNormal.normalized}，中心点：{targetFaceCenter}，射线检测点：{hit.point}");
                     if (ok)
                     {
                         _moduleSelector.DeselectModule();
@@ -282,33 +285,23 @@ namespace Controllers
                 }
             }
         }
-        
-        private int FindBestAttachableFaceIndex((Vector3 normal, Vector3 center, bool canAttach)[] faces,
-            Vector3 targetNormal, BaseModule targetModule)
-        {
-            ModuleType targetType = targetModule.moduleType;
 
+        private int FindBestAttachableFaceIndex(ModuleFace[] faces,
+            Vector3 targetNormal)
+        {
             int bestIdx = -1;
             float bestValue = -1f;
             
-            switch (targetType)
+            for (int i = 0; i < faces.Length; i++)
             {
-                case ModuleType.BaseCube: 
-                case ModuleType.NormalCube:
-                case ModuleType.NormalCylinder:
-                    for (int i = 0; i < faces.Length; i++)
-                    {
-                        if (!faces[i].canAttach) continue;
-                        float value = Vector3.Dot(faces[i].normal, targetNormal);
+                if (!faces[i].CanAttach) continue;
+                float value = Vector3.Dot(faces[i].Normal, targetNormal);
 
-                        if (value > bestValue)
-                        {
-                            bestValue = value;
-                            bestIdx = i;
-                        }
-                    }
-                    break;
-                
+                if (value > bestValue)
+                {
+                    bestValue = value;
+                    bestIdx = i;
+                }
             }
             
             return bestIdx;
@@ -325,15 +318,15 @@ namespace Controllers
                 return false;
             Vector3 hitNormal = hit.normal;
             
-            var targetFaces = targetAttach.GetAttachableFaces();
+            var targetFaces = targetModule._attachableFaces;
             
             if(IsHitFaceAttachable(hit.normal, targetFaces) == false) return false;
             
-            int bestTargetFaceIdx = FindBestAttachableFaceIndex(targetFaces, hitNormal, targetModule);
+            int bestTargetFaceIdx = FindBestAttachableFaceIndex(targetFaces, hitNormal);
             if (bestTargetFaceIdx < 0)
                 return false;
-            targetFaceNormal = targetFaces[bestTargetFaceIdx].normal;
-            targetFaceCenter = targetFaces[bestTargetFaceIdx].center;
+            targetFaceNormal = targetFaces[bestTargetFaceIdx].Normal;
+            targetFaceCenter = targetFaces[bestTargetFaceIdx].Center;
             return true;
         }
 
@@ -343,15 +336,15 @@ namespace Controllers
             var selectedAttach = selectedModule as IAttachable;
             if (selectedAttach == null)
                 return false;
-            var selectedFaces = selectedAttach.GetAttachableFaces();
+            var selectedFaces = selectedModule._attachableFaces;
             int bestSelectedFaceIdx = -1;
             float minDist = float.MaxValue;
             
             // 找到最近的可拼接面
             for (int i = 0; i < selectedFaces.Length; i++)
             {
-                if (!selectedFaces[i].canAttach) continue;
-                float dist = Vector3.Distance(selectedFaces[i].center, hitPoint);
+                if (!selectedFaces[i].CanAttach) continue;
+                float dist = Vector3.Distance(selectedFaces[i].Center, hitPoint);
                 if (dist < minDist)
                 {
                     minDist = dist;
@@ -377,7 +370,7 @@ namespace Controllers
                 // 尝试找到源模块的最佳拼接面的下标
                 if (TryFindSourceAttachableFaceIndex(_moduleSelector.SelectedModule, hit.point))
                 {
-                    Debug.Log($"展示预览...");
+                    //Debug.Log($"展示预览...");
                     CreateOrUpdatePreview(_moduleSelector.SelectedModule, targetModule, targetFaceNormal, targetFaceCenter, hit.point);
                     
                     _showingPreview = true;
