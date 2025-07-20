@@ -11,7 +11,7 @@ namespace Module.ModuleScript
         protected override void Awake()
         {
             base.Awake();
-            
+            DontDestroyOnLoad(gameObject);
             _rb.isKinematic = true;
             _rb.detectCollisions = true;
             moduleType = ModuleType.BaseCube;

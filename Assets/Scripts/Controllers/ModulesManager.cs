@@ -115,7 +115,7 @@ namespace Controllers
 
         /// <summary> 获取所有模块列表 </summary>
         /// <returns> 模块信息列表 </returns>
-        public List<ModuleInfo> GetAllModules()
+        public List<ModuleInfo> GetAllModulesInfo()
         {
             return new List<ModuleInfo>(assembledModules);
         }

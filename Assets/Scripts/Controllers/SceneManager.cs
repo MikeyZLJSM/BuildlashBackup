@@ -1,8 +1,5 @@
 ﻿using System;
-using Unity;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
 
 namespace Controllers
 {
@@ -11,42 +8,57 @@ namespace Controllers
     {
         public static SceneManager Instance { get; private set; }
         
-
+        /// <summary>场景切换事件，参数为新场景名称</summary>
+        public static event System.Action<string> OnSceneChanged;
+        
+        [Header("场景名称")]
         public const string BuildingSceneName = "ModuleBuilding";
         public const string BattleSceneName = "Battle";
+        
+        [Header("管理器引用")]
         public GameObject modulesManager;
         public GameObject moduleSelector;
-        public GameObject uiController;
+        public GameObject battleManager;
         public GameObject buildController;
         
+        [Header("当前场景名称")]
+        public string currentScene;
         
         public void Awake()
-        {
-            if (Instance is not null)
+        {  
+            if (Instance != null)
             {
                 Destroy(gameObject);
                 return;
-            };
+            }
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LoadBuildingScene();
+            
+            
         }
-        
+        public void Start()
+        {
+           
+        }
         public void LoadBuildingScene()
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene(BuildingSceneName);
             buildController.SetActive(true);
             moduleSelector.SetActive(true);
+            battleManager.SetActive(false);
+            currentScene = BuildingSceneName;
+            OnSceneChanged?.Invoke(BuildingSceneName);
         }
         
         public void LoadBattleScene()
         {
             UnityEngine.SceneManagement.SceneManager.LoadScene(BattleSceneName);
-            buildController.SetActive(true);
-            moduleSelector.SetActive(true);
+            buildController.SetActive(false);
+            moduleSelector.SetActive(false);
+            battleManager.SetActive(true);
+            currentScene = BattleSceneName;
+            OnSceneChanged?.Invoke(BattleSceneName);
         }
-         
-        
 
     }
 }

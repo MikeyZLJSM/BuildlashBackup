@@ -18,7 +18,7 @@ namespace Module
         /// <summary>是否可以攻击</summary>
         [NonSerialized] public bool CanAttack = true;
         /// <summary>生命值</summary>
-        [NonSerialized] public int Health;
+        [NonSerialized] public int Health = 100;
         /// <summary>攻击目标数量（单体，群体，溅射）</summary>
         [NonSerialized] public TargetCount TargetCount;
         /// <summary>攻击目标移动类型（静止敌人，移动敌人）</summary>
@@ -29,9 +29,5 @@ namespace Module
             get => TargetCount == TargetCount.SplashAttack ? _splashRadius : 0;
             set => _splashRadius = TargetCount == TargetCount.SplashAttack ? value : 0;
         }
-        
-        
-        
     }
-    
 }

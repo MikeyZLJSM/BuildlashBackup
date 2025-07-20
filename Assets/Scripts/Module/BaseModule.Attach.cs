@@ -185,7 +185,7 @@ namespace Module
             euler.z = Mathf.Round(euler.z / 90f) * 90f;
             transform.rotation = Quaternion.Euler(euler);
 
-            // 1. 重新获取当前的可拼接面（确保使用最新的位置信息）
+            // 1. 重新获取当前的可拼接面（确保使用最新的位置信信息）
 
             // 1. 找到自身所有可拼接面，选最近的面
             int minIdx = 0;

@@ -12,7 +12,7 @@ namespace Controllers
         [Header("鼠标滚轮缩放速度")] public float moveSpeed = 1f; //前后移动速度
 
         private Vector3 _rotionTransform;
-        private new Camera camera;
+        public Camera camera { get; private set; }
         public static CameraScript Instance { get; private set; }
         public void Awake()
         {
