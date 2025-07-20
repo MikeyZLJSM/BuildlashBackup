@@ -5,12 +5,16 @@ using Module.Enums;
 using Module.Interfaces;
 using UnityEngine;
 
+
+
 namespace Controllers
 {
-    public class ModulesManager : MonoBehaviour
+    
+    /// <summary> 模块管理，负责储存拼接情况和管理战斗逻辑 </summary>
+    public partial class ModulesManager 
     {
         /// <summary> 中心模块 </summary>
-        [Header("模块管理")] [SerializeField] private BaseModule centerModule;
+        [Header("模块管理")] [SerializeField] private BaseModule centerModule ;
         /// <summary> 所有已拼装模块信息 </summary>
         [SerializeField] private List<ModuleInfo> assembledModules = new();
         /// <summary> 网格大小（每格的世界坐标单位 ） </summary>
@@ -23,34 +27,28 @@ namespace Controllers
         [SerializeField] private float globalAttackRange = 10f;
         /// <summary> 显示调试信息 </summary>
         [Header("调试信息")] [SerializeField] private bool showDebugInfo = true;
-
+        
+        
+        
         public static ModulesManager Instance { get; private set; }
 
         private void Awake()
         {
-            if (Instance == null)
+            if (Instance is not null) return;
                 Instance = this;
-            else
-                Destroy(gameObject);
+                DontDestroyOnLoad(gameObject);
         }
-
+        
         private void Start()
         {
+            centerModule = GameObject.Find("BaseCube")?.GetComponent<BaseModule>();
             // 确保中心模块已设置
             if (centerModule == null) Debug.LogError("ModulesManager 中心模块未设置");
 
             // 初始化模块
             InitializeModules();
         }
-
-        private void Update()
-        {
-            if (enableAttack)
-            {
-                //UpdateModuleAttacks();
-            }
-        }
-
+        
 
         /// <summary> 初始化时收集所有现有模块 </summary>
         private void InitializeModules()
@@ -113,88 +111,6 @@ namespace Controllers
                     RegisterModule(childModule);
                     CollectChildModules(childModule); // 递归收集子模块的子模块
                 }
-        }
-
-        /// <summary> 更新所有模块的攻击逻辑 </summary>
-        private void UpdateModuleAttacks()
-        {
-            foreach (ModuleInfo moduleInfo in assembledModules)
-            {
-                if (moduleInfo.module == null || !moduleInfo.isAttackModule) continue;
-
-                // 检查模块是否实现了攻击接口
-                if (moduleInfo.module is IAttackable attackableModule)
-                {
-                    UpdateModuleCooldown(moduleInfo.module);
-
-                    // 如果可以攻击，执行攻击逻辑
-                    if (moduleInfo.module.CanAttack && attackableModule.IsAttackReady())
-                        ExecuteModuleAttack(attackableModule, moduleInfo);
-                }
-            }
-        }
-
-        /// <summary> 更新模块冷却时间 </summary>
-        /// <param name = "module" > 模块 </param>
-        private void UpdateModuleCooldown(BaseModule module)
-        {
-            if (module.AttackCooldown > 0)
-            {
-                module.AttackCooldown -= Time.deltaTime;
-                if (module.AttackCooldown <= 0) module.CanAttack = true;
-            }
-        }
-
-        /// <summary> 执行模块攻击 </summary>
-        /// <param name = "attackableModule" > 可攻击的模块 </param>
-        /// <param name = "moduleInfo" > 模块信息 </param>
-        private void ExecuteModuleAttack(IAttackable attackableModule, ModuleInfo moduleInfo)
-        {
-            // 获取攻击范围内的目标
-            List<GameObject> targets = attackableModule.GetTargetsInRange();
-
-            if (targets != null && targets.Count > 0)
-            {
-                bool attackExecuted = false;
-
-                // 根据攻击目标数量类型执行不同的攻击
-                switch (moduleInfo.module.TargetCount)
-                {
-                    case TargetCount.SingleEnemy:
-                        // 单体攻击，攻击第一个目标
-                        if (attackableModule.CanAttackTarget(targets[0]))
-                        {
-                            attackExecuted = attackableModule.Attack(targets[0]);
-                            if (showDebugInfo && attackExecuted)
-                                Debug.Log($"[{moduleInfo.moduleName}] 单体攻击目标: {targets[0].name}");
-                        }
-
-                        break;
-
-                    case TargetCount.MultipleEnemies:
-                        // 群体攻击
-                        attackExecuted = attackableModule.AttackMultiple(targets);
-                        if (showDebugInfo && attackExecuted)
-                            Debug.Log($"[{moduleInfo.moduleName}] 群体攻击 {targets.Count} 个目标");
-                        break;
-
-                    case TargetCount.SplashAttack:
-                        // 溅射攻击
-                        attackExecuted = attackableModule.AttackMultiple(targets);
-                        if (showDebugInfo && attackExecuted)
-                            Debug.Log(
-                                $"[{moduleInfo.moduleName}] 溅射攻击 {targets.Count} 个目标，溅射范围: {moduleInfo.module.SplashRadius}");
-                        break;
-                }
-
-                // 如果攻击成功，开始冷却
-                if (attackExecuted)
-                {
-                    attackableModule.StartAttackCooldown();
-                    moduleInfo.module.CanAttack = false;
-                    moduleInfo.module.AttackCooldown = 1f / moduleInfo.module.AttackSpeed;
-                }
-            }
         }
 
         /// <summary> 获取所有模块列表 </summary>
@@ -287,6 +203,13 @@ namespace Controllers
         {
             centerModule = module;
             InitializeModules(); // 重新初始化所有模块
+        }
+
+        /// <summary> 获取中心模块 </summary>
+        /// <returns> 中心模块 </returns>
+        public BaseModule GetCenterModule()
+        {
+            return centerModule;
         }
 
         /// <summary> 当模块拼接时调用此方法（由BaseModule调用） </summary>

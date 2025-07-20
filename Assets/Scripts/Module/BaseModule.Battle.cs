@@ -29,6 +29,9 @@ namespace Module
             get => TargetCount == TargetCount.SplashAttack ? _splashRadius : 0;
             set => _splashRadius = TargetCount == TargetCount.SplashAttack ? value : 0;
         }
+        
+        
+        
     }
     
 }

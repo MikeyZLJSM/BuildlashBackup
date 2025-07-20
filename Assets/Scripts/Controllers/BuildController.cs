@@ -34,11 +34,7 @@ namespace Controllers
 
         private void Awake()
         {
-            if (Instance != null) 
-            {
-                Destroy(gameObject);
-                return;
-            }
+            if (Instance is not null) return;
             Instance = this;
         }
 

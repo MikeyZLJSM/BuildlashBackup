@@ -104,3 +104,15 @@ InitTestScene*.unity*
 .vs
 .vsconfig
 .github/copilot-instructions.md
+
+#TMP Pro File
+/Assets/TextMesh Pro/Fonts
+/Assets/TextMesh Pro/Fonts.meta
+/Assets/TextMesh Pro/Examples & Extras
+/Assets/TextMesh Pro/Examples & Extras.meta
+/Assets/TextMesh Pro/Shaders
+/Assets/TextMesh Pro/Shaders.meta
+/Assets/TextMesh Pro/Sprites
+/Assets/TextMesh Pro/Sprites.meta
+/Assets/TextMesh Pro/Documentation
+/Assets/TextMesh Pro/Documentation.meta
