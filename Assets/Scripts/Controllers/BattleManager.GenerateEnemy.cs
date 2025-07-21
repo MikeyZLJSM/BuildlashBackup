@@ -13,6 +13,8 @@ namespace Controllers
         /// <summary>敌人生成高度偏移</summary>
         [Header("生成偏移设置")] public float spawnHeightOffset = 0.5f;
 
+        private int enemeyLayer = 8;
+
         /// <summary>在鼠标点击处生成一个默认的敌人</summary>
         public void GenerateEnemy(GameObject enemyPrefab = null)
         {
@@ -43,6 +45,8 @@ namespace Controllers
                     enemyObj.transform.LookAt(ModulesManager.Instance.GetCenterModule().transform);
                 }
 
+                enemyObj.layer = enemeyLayer;
+                
                 Debug.Log($"在Ground层的位置 {hit.point} 生成了敌人");
             }
             else

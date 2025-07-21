@@ -15,7 +15,7 @@ namespace Controllers
         public float PlayerCurrentHealth;
         
         /// <summary>所有注册的敌人列表</summary>
-        [SerializeField]private List<Enemy.BaseEnemy> registeredEnemies = new List<Enemy.BaseEnemy>();
+        [SerializeField]private List<Enemy.BaseEnemy> _registeredEnemies = new List<Enemy.BaseEnemy>();
         
         /// <summary>初始化单例</summary>
         private void Awake()
@@ -39,17 +39,17 @@ namespace Controllers
         private void Update()
         {
             // 倒序遍历，防止在遍历过程中移除敌人时出现索引错误
-            for (int i = registeredEnemies.Count - 1; i >= 0; i--)
+            for (int i = _registeredEnemies.Count - 1; i >= 0; i--)
             {
-                if (registeredEnemies[i] == null)
+                if (_registeredEnemies[i] == null)
                 {
                     // 如果敌人被销毁，从列表中移除
-                    registeredEnemies.RemoveAt(i);
+                    _registeredEnemies.RemoveAt(i);
                 }
                 else
                 {
                     // 调用敌人的逻辑更新
-                    registeredEnemies[i].OnBattleUpdate();
+                    _registeredEnemies[i].OnBattleUpdate();
                 }
             }
             
@@ -64,9 +64,9 @@ namespace Controllers
         /// <param name="enemy">要注册的敌人</param>
         public void RegisterEnemy(Enemy.BaseEnemy enemy)
         {
-            if (enemy != null && !registeredEnemies.Contains(enemy))
+            if (enemy != null && !_registeredEnemies.Contains(enemy))
             {
-                registeredEnemies.Add(enemy);
+                _registeredEnemies.Add(enemy);
                 Debug.Log($"敌人 {enemy.name} 已注册到战斗管理器");
             }
         }
@@ -77,9 +77,9 @@ namespace Controllers
         /// <param name="enemy">要注销的敌人</param>
         public void UnregisterEnemy(Enemy.BaseEnemy enemy)
         {
-            if (registeredEnemies.Contains(enemy))
+            if (_registeredEnemies.Contains(enemy))
             {
-                registeredEnemies.Remove(enemy);
+                _registeredEnemies.Remove(enemy);
                 Debug.Log($"敌人 {enemy.name} 已从战斗管理器注销");
             }
         }
@@ -88,27 +88,27 @@ namespace Controllers
         /// <returns>敌人数量</returns>
         public int GetEnemyCount()
         {
-            return registeredEnemies.Count;
+            return _registeredEnemies.Count;
         }
         
         /// <summary>获取所有注册的敌人列表（只读）</summary>
         /// <returns>敌人列表的只读副本</returns>
         public List<Enemy.BaseEnemy> GetAllEnemies()
         {
-            return new List<Enemy.BaseEnemy>(registeredEnemies);
+            return new List<Enemy.BaseEnemy>(_registeredEnemies);
         }
         
         /// <summary>清除所有注册的敌人</summary>
         public void ClearAllEnemies()
         {
-            foreach (Enemy.BaseEnemy enemy in registeredEnemies)
+            foreach (Enemy.BaseEnemy enemy in _registeredEnemies)
             {
                 if (enemy != null)
                 {
                     Destroy(enemy.gameObject);
                 }
             }
-            registeredEnemies.Clear();
+            _registeredEnemies.Clear();
         }
         
         /// <summary>计算玩家最大血量</summary>
@@ -118,7 +118,7 @@ namespace Controllers
             PlayerMaxHealth = 0f;
             foreach( ModulesManager.ModuleInfo moduleInfo in  ModulesManager.Instance.GetAllModulesInfo())
             {
-                PlayerMaxHealth += moduleInfo.module.Health;
+                PlayerMaxHealth += moduleInfo.module._health;
             }
             return PlayerMaxHealth;
         }

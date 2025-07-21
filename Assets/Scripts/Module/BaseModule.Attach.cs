@@ -20,7 +20,7 @@ namespace Module
         public ModuleType moduleType;
         public float moduleMass = 1f;
         public BaseModule parentModule;
-        public List<BaseModule> childModules = new List<BaseModule>();
+        public List<BaseModule> _childModules = new List<BaseModule>();
         
         public ModuleFace[] _attachableFaces;
 
@@ -68,7 +68,7 @@ namespace Module
             _rb.AddForce(UnityEngine.Random.onUnitSphere * 10f, ForceMode.VelocityChange);
             _rb.AddTorque(UnityEngine.Random.onUnitSphere * 10f, ForceMode.VelocityChange);
 
-            foreach (var child in childModules.ToList())
+            foreach (var child in _childModules.ToList())
             {
                 if (!child) continue;
                 child.RemoveModule();
@@ -80,17 +80,17 @@ namespace Module
 
         public void AddChildModuleToList(BaseModule childModule)
         {
-            if (childModule != null && !childModules.Contains(childModule))
+            if (childModule != null && !_childModules.Contains(childModule))
             {
-                childModules.Add(childModule);
+                _childModules.Add(childModule);
             }
         }
 
         public void RemoveChildModuleFromList(BaseModule childModule)
         {
-            if (childModules.Contains(childModule))
+            if (_childModules.Contains(childModule))
             {
-                childModules.Remove(childModule);
+                _childModules.Remove(childModule);
             }
         }
 
@@ -275,7 +275,7 @@ namespace Module
                 }
             }
             
-            foreach (var childModule in childModules.ToList())
+            foreach (var childModule in _childModules.ToList())
             {
                 childModule.SetAllFacesDetach();
             }

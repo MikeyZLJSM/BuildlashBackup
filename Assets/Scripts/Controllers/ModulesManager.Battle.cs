@@ -31,7 +31,7 @@ namespace Controllers
                     UpdateModuleCooldown(moduleInfo.module);
 
                     // 如果可以攻击，执行攻击逻辑
-                    if (moduleInfo.module.CanAttack && attackableModule.IsAttackReady())
+                    if (moduleInfo.module._canAttack && attackableModule.IsAttackReady())
                         ExecuteModuleAttack(attackableModule, moduleInfo);
                 }
             }
@@ -41,10 +41,10 @@ namespace Controllers
         /// <param name = "module" > 模块 </param>
         private void UpdateModuleCooldown(BaseModule module)
         {
-            if (module.AttackCooldown > 0)
+            if (module._attackCD > 0)
             {
-                module.AttackCooldown -= Time.deltaTime;
-                if (module.AttackCooldown <= 0) module.CanAttack = true;
+                module._attackCD -= Time.deltaTime;
+                if (module._attackCD <= 0) module._canAttack = true;
             }
         }
 
@@ -61,7 +61,7 @@ namespace Controllers
                 bool attackExecuted = false;
 
                 // 根据攻击目标数量类型执行不同的攻击
-                switch (moduleInfo.module.TargetCount)
+                switch (moduleInfo.module._targetCount)
                 {
                     case TargetCount.SingleEnemy:
                         // 单体攻击，攻击第一个目标
@@ -94,8 +94,8 @@ namespace Controllers
                 if (attackExecuted)
                 {
                     attackableModule.StartAttackCooldown();
-                    moduleInfo.module.CanAttack = false;
-                    moduleInfo.module.AttackCooldown = 1f / moduleInfo.module.AttackSpeed;
+                    moduleInfo.module._canAttack = false;
+                    moduleInfo.module._attackCD = 1f / moduleInfo.module._attackSpeed;
                 }
             }
         }

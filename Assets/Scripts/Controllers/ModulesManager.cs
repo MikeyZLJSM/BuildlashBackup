@@ -103,9 +103,9 @@ namespace Controllers
         /// <param name = "parentModule" > 父模块 </param>
         private void CollectChildModules(BaseModule parentModule)
         {
-            if (parentModule?.childModules == null) return;
+            if (parentModule?._childModules == null) return;
 
-            foreach (BaseModule childModule in parentModule.childModules)
+            foreach (BaseModule childModule in parentModule._childModules)
                 if (childModule != null)
                 {
                     RegisterModule(childModule);

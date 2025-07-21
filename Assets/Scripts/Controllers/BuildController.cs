@@ -18,14 +18,9 @@ namespace Controllers
 
         [SerializeField] private ModuleSelector _moduleSelector;
         
-        [SerializeField, Header("插槽的层级")] 
-        private int socketLayer = 8;
+        [SerializeField, Header("模块的层级")] private int moduleLayer = 7;    
         
-        [SerializeField, Header("模块的层级")] 
-        private int moduleLayer = 7;    
-        
-        [Header("删除键"), SerializeField] 
-        private KeyCode removeButton = KeyCode.E;
+        [Header("删除键"), SerializeField] private KeyCode removeButton = KeyCode.E;
 
         [Header("拼接预览")]
         private GameObject _previewObject;
