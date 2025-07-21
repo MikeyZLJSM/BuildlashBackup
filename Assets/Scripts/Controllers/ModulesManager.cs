@@ -11,7 +11,7 @@ namespace Controllers
 {
     
     /// <summary> 模块管理，负责储存拼接情况和管理战斗逻辑 </summary>
-    public partial class ModulesManager 
+    public partial class ModulesManager : MonoBehaviour
     {
         /// <summary> 中心模块 </summary>
         [Header("模块管理")] [SerializeField] private BaseModule centerModule ;

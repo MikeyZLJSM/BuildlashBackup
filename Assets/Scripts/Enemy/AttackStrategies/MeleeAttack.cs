@@ -1,4 +1,5 @@
-﻿using Enemy.Interfaces;
+﻿using Controllers.Battle;
+using Enemy.Interfaces;
 using UnityEngine;
 
 namespace Enemy.AttackStrategies
@@ -19,9 +20,9 @@ namespace Enemy.AttackStrategies
             if (targetModule != null)
             {
                 // 通过BattleManager处理伤害
-                if (Controllers.BattleManager.Instance != null)
+                if (BattleManager.Instance != null)
                 {
-                    Controllers.BattleManager.Instance.DamagePlayer(attackPower, targetModule);
+                    BattleManager.Instance.DamagePlayer(attackPower);
                     Debug.Log($"近战攻击命中目标，造成 {attackPower} 点伤害");
                     return true;
                 }

@@ -6,6 +6,7 @@ using Enemy.Enum;
 using Enemy.AttackStrategies;
 using Enemy.MovementStrategies;
 using Controllers;
+using BattleManager = Controllers.Battle.BattleManager;
 
 
 namespace Enemy
@@ -63,9 +64,9 @@ namespace Enemy
         protected virtual void Start()
         {
             // 注册到BattleManager
-            if (Controllers.BattleManager.Instance != null)
+            if (BattleManager.Instance != null)
             {
-                Controllers.BattleManager.Instance.RegisterEnemy(this);
+                BattleManager.Instance.RegisterEnemy(this);
             }
         }
 
@@ -159,9 +160,9 @@ namespace Enemy
         protected virtual void Die()
         {
             // 从BattleManager注销
-            if (Controllers.BattleManager.Instance != null)
+            if (BattleManager.Instance != null)
             {
-                Controllers.BattleManager.Instance.UnregisterEnemy(this);
+                BattleManager.Instance.UnregisterEnemy(this);
             }
             Destroy(gameObject);
         }
@@ -169,9 +170,9 @@ namespace Enemy
         /// <summary> 当对象被销毁时，确保从BattleManager注销 </summary>
         protected virtual void OnDestroy()
         {
-            if (Controllers.BattleManager.Instance != null)
+            if (BattleManager.Instance != null)
             {
-                Controllers.BattleManager.Instance.UnregisterEnemy(this);
+                BattleManager.Instance.UnregisterEnemy(this);
             }
         }
         
