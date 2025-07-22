@@ -1,8 +1,7 @@
-using System;
 using Module.Enums;
 using UnityEngine;
 
-namespace Module.ModuleScript
+namespace Module.ModuleScript.Cube
 {
     // 基础立方体模块
     [AddComponentMenu("Modules/CubeModule")]

@@ -1,9 +1,7 @@
-using System;
 using Module.Enums;
-using Module.Interfaces;
 using UnityEngine;
 
-namespace Module.ModuleScript
+namespace Module.ModuleScript.Cube
 {
     [AddComponentMenu("Modules/NormalCube")]
     public class NormalCube : BaseModule

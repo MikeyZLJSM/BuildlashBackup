@@ -1,12 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Module.Enums;
-using Module.Interfaces;
 using UnityEngine;
 
-
-namespace Module.ModuleScript
+namespace Module.ModuleScript.Cylinder
 {
     public class NormalCylinder : BaseModule
     {

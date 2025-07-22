@@ -1,18 +1,14 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Module.Enums;
 using UnityEngine;
-using Module.Interfaces;
 
-namespace Module.ModuleScript
+namespace Module.ModuleScript.Cone
 {
-    public class NormalSphere : BaseModule
+    public class NormalCone : BaseModule
     {
         protected override void Awake()
         {
             base.Awake();
-            moduleType = ModuleType.NormalSphere;
+            moduleType = ModuleType.NormalCone;
         }
 
         public override ModuleFace[] GetAttachableFaces()
@@ -26,5 +22,6 @@ namespace Module.ModuleScript
     
             return _attachableFaces;
         }
+        
     }
 }

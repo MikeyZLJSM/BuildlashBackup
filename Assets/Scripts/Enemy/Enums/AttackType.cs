@@ -1,4 +1,4 @@
-﻿namespace Enemy.Enum
+﻿namespace Enemy.Enums
 {
     /// <summary>攻击策略类型枚举</summary>
     public enum AttackType

@@ -1,4 +1,4 @@
-﻿namespace Enemy.Enum
+﻿namespace Enemy.Enums
 {
     
     /// <summary>移动策略类型枚举</summary>

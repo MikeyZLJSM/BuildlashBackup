@@ -113,7 +113,7 @@ namespace Controllers.Battle
             }
         }
 
-        private void EnemyLogic()
+        private void UpdateEnemyLogic()
         {
             // 倒序遍历，防止在遍历过程中移除敌人时出现索引错误
             for (int i = _registeredEnemies.Count - 1; i >= 0; i--)

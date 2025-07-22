@@ -226,13 +226,7 @@ namespace Controllers
         {
             UnregisterModule(module);
         }
-
-        /// <summary> 获取攻击模块数量 </summary>
-        /// <returns> 攻击模块数量 </returns>
-        public int GetAttackModuleCount()
-        {
-            return assembledModules.FindAll(info => info.isAttackModule).Count;
-        }
+        
 
         /// <summary> 打印所有模块信息（调试用） </summary>
         [ContextMenu("打印模块信息")]
@@ -242,7 +236,6 @@ namespace Controllers
             Debug.Log($"中心模块: {(centerModule != null ? centerModule.name : "无")}");
             Debug.Log($"网格大小: {gridSize}");
             Debug.Log($"总模块数: {assembledModules.Count}");
-            Debug.Log($"攻击模块数: {GetAttackModuleCount()}");
 
             (Vector3Int min, Vector3Int max) bounds = GetGridBounds();
             Debug.Log(

@@ -2,10 +2,11 @@ using System;
 using System.Runtime.Serialization;
 using Enemy.Interfaces;
 using UnityEngine;
-using Enemy.Enum;
 using Enemy.AttackStrategies;
 using Enemy.MovementStrategies;
 using Controllers;
+using Enemy.Enums;
+using AttackType = Enemy.Enums.AttackType;
 using BattleManager = Controllers.Battle.BattleManager;
 
 

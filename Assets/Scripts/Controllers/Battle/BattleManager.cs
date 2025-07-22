@@ -29,11 +29,15 @@ namespace Controllers.Battle
             CaculateMaxHealth();
             PlayerCurrentHealth = PlayerMaxHealth;
             UIController.Instance.UpdateHealthText(PlayerCurrentHealth,PlayerMaxHealth );
+            
+            InitializeModuleBattleSystem();
         }
 
         private void Update()
         {
-            EnemyLogic();
+            UpdateEnemyLogic();
+            
+            UpdateModuleLogic();
         }
 
         /// <summary>计算玩家最大血量</summary>

@@ -1,19 +1,17 @@
 using Controllers;
-using Module;
-using UnityEngine;
 using Enemy.MovementStrategies;
 using Enemy.AttackStrategies;
-using Enemy.Enum;
+using Enemy.Enums;
 using Enemy.Interfaces;
+using AttackType = Enemy.Enums.AttackType;
 
 
 namespace Enemy.EnemyScript
 {
     /// <summary>简单的敌人类，继承自BaseEnemy</summary>
     
-    public partial class SimpleEnemy : BaseEnemy
+    public class SimpleEnemy : BaseEnemy
     {
-        
         /// <summary>初始化</summary>
         protected override void Start()
         {
