@@ -10,6 +10,6 @@ namespace Module.Interfaces
         bool CanAttack();
         void StartAttackCD();
         List<GameObject> GetTargetsInRange();
-        void FireBullet(GameObject target); // 攻击模块统一实现FireBullet，调用BulletManager发射子弹
+        void Fire(GameObject target); // 攻击模块统一实现FireBullet，调用BulletManager发射子弹
     }
 }

@@ -111,7 +111,7 @@ namespace Controllers.Battle
         {
             if (target.TryGetComponent<BaseEnemy>(out var enemy))
             {
-                attackingModule.FireBullet(target);
+                attackingModule.Fire(target);
                 
                 // 可以在这里添加攻击特效
                 Debug.Log($"{module.name} 对 {enemy.name} 造成了 {module._attackValue} 点{module._damageType}伤害");

@@ -68,7 +68,7 @@ namespace Module.ModuleScript.Sphere
             return targets;
         }
         
-        public void FireBullet(GameObject target)
+        public void Fire(GameObject target)
         {
             if (_bulletPrefab == null || target == null)
             {
