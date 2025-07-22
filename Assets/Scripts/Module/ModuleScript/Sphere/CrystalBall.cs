@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Module.Battle;
 using Module.Enums;
 using Module.Interfaces;
 using UnityEngine;
@@ -8,30 +9,33 @@ namespace Module.ModuleScript.Sphere
     public class CrystalBall : NormalSphere, IAttackable
     {
         [SerializeField] private float _attackRange = 5f;
-        [SerializeField] private GameObject _bulletPrefab; 
-        [SerializeField] private float _bulletSpeed = 10f; 
-        [SerializeField] private Transform _firePoint; 
+        [SerializeField] private GameObject _bulletPrefab; // 子弹预制体
+        [SerializeField] private float _bulletSpeed = 10f; // 子弹飞行速度
+        [SerializeField] private Transform _firePoint; // 发射点
+        
         
         protected override void Awake()
         {
             base.Awake();
             
-            // 设置水晶球的战斗属性
-            _attackValue = 8;                            
-            _damageType = DamageType.Magical;            
-            _targetCount = TargetCount.SingleEnemy;      
-            _attackSpeed = 1.0f;
+            // 初始化攻击参数
+            _attackParameters = new AttackParameters
+            {
+                targetMovementType = TargetMovement.Any,
+                targetCount = TargetCount.SingleEnemy,
+                damageType = DamageType.Magical,
+                attackAttribute = AttackAttribute.None,
+                damage = 8,
+                attackSpeed = 1.0f,
+                attackRange = _attackRange,
+                bulletSpeed = _bulletSpeed,
+                bulletPrefab = _bulletPrefab
+            };
             
-            // 如果没有指定发射点，默认使用自身位置
             if (_firePoint == null)
             {
                 _firePoint = transform;
             }
-        }
-        
-        public AttackType GetAttackType()
-        {
-            return AttackType.Periodic;
         }
 
         public bool CanAttack()
@@ -42,7 +46,7 @@ namespace Module.ModuleScript.Sphere
         public void StartAttackCD()
         {
             _canAttack = false;
-            _attackCD = 1f / _attackSpeed;
+            _attackCD = 1f / _attackParameters.attackSpeed;
         }
 
         public List<GameObject> GetTargetsInRange()
@@ -68,24 +72,25 @@ namespace Module.ModuleScript.Sphere
             return targets;
         }
         
-        public void Fire(GameObject target)
+        public AttackParameters GetAttackParameters()
         {
-            if (_bulletPrefab == null || target == null)
+            // 返回攻击参数的副本，以防被修改
+            return _attackParameters.Clone();
+        }
+        
+        public void ExecuteAttack(GameObject target)
+        {
+            if (!_bulletPrefab || !target)
             {
-                Debug.LogWarning("子弹预制体或目标为空");
+                Debug.LogWarning("子弹预制体或目标为空，无法发射子弹");
                 return;
             }
             
-            // 统一调用子弹管理器生成子弹
-            Controllers.Battle.BulletManager.Instance.SpawnAndFireBullet(
-                _bulletPrefab,
-                _firePoint.position,
-                target.transform,
-                _attackValue,
-                _damageType,
-                _bulletSpeed
-            );
+            // 创建攻击上下文
+            AttackContext context = new AttackContext(this, target, GetAttackParameters());
             
+            // 调用子弹管理器生成子弹
+            Controllers.Battle.BulletManager.Instance.SpawnBullet(context);
         }
         
         private void OnDrawGizmosSelected()

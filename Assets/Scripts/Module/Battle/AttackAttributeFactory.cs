@@ -1,0 +1,23 @@
+using Module.Enums;
+using Module.Interfaces.Attributes;
+
+namespace Module.Battle
+{
+    /// <summary>
+    /// 攻击属性工厂，根据攻击属性枚举用于创建攻击属性实现
+    /// </summary>
+    public static class AttackAttributeFactory
+    {
+        public static IAttackAttribute CreateAttribute(AttackAttribute attribute)
+        {
+            switch (attribute)
+            {
+                case AttackAttribute.None:
+                    return new NormalAttribute();
+                
+                default:
+                    return new NormalAttribute();
+            }
+        }
+    }
+} 

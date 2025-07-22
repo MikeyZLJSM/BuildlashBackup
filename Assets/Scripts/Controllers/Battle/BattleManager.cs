@@ -37,7 +37,7 @@ namespace Controllers.Battle
         {
             UpdateEnemyLogic();
             
-            UpdateModuleLogic();
+            UpdateModuleBattle();
         }
 
         /// <summary>计算玩家最大血量</summary>

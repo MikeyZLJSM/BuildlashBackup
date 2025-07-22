@@ -19,12 +19,8 @@ namespace Controllers
         [SerializeField] private List<ModuleInfo> assembledModules = new();
         /// <summary> 网格大小（每格的世界坐标单位 ） </summary>
         [Header("网格设置")] [SerializeField] private float gridSize = 1f;
-        /// <summary> 是否启用攻击 </summary>
-        [Header("攻击设置")] [SerializeField] private bool enableAttack = true;
         /// <summary> 敌人图层 </summary>
         [SerializeField] private LayerMask enemyLayerMask = 1 << 8; // 敌人图层
-        /// <summary> 全局攻击范围 </summary>
-        [SerializeField] private float globalAttackRange = 10f;
         /// <summary> 显示调试信息 </summary>
         [Header("调试信息")] [SerializeField] private bool showDebugInfo = true;
         

@@ -1,5 +1,7 @@
 using System;
+using Module.Battle;
 using Module.Enums;
+using Module.Interfaces.Attributes;
 using UnityEngine;
 
 namespace Controllers.Battle
@@ -13,13 +15,17 @@ namespace Controllers.Battle
         [SerializeField] private float _collisionRadius = 0.2f;
         [SerializeField] private LayerMask _targetLayerMask;
         
+        // 攻击上下文
+        private AttackContext _context;
+        
         // 子弹属性
         private Transform _target;
-        private int _damage;
-        private DamageType _damageType;
         private float _speed;
         private float _lifetime;
         private float _spawnTime;
+        
+        // 攻击属性实现
+        private IAttackAttribute _attackAttribute;
         
         // 状态
         private bool _isInitialized = false;
@@ -31,19 +37,21 @@ namespace Controllers.Battle
         /// <summary>
         /// 初始化子弹属性
         /// </summary>
-        public void Initialize(Transform target, int damage, DamageType damageType, float speed, float lifetime)
+        public void Initialize(AttackContext context)
         {
-            _target = target;
-            _damage = damage;
-            _damageType = damageType;
-            _speed = speed;
-            _lifetime = lifetime;
+            _context = context;
+            _target = context.target?.transform;
+            _speed = context.parameters.bulletSpeed;
+            _lifetime = 10f; // 默认生命周期
             _spawnTime = Time.time;
             _isInitialized = true;
             _isHoming = true;
             
+            // 创建攻击属性实现
+            _attackAttribute = AttackAttributeFactory.CreateAttribute(context.parameters.attackAttribute);
+            
             // 设置子弹朝向目标
-            if (_target != null)
+            if (_target)
             {
                 transform.LookAt(_target);
             }
@@ -61,7 +69,7 @@ namespace Controllers.Battle
             }
             
             // 检查目标是否存在
-            if (_target == null)
+            if (!_target)
             {
                 // 目标不存在时，继续沿当前方向飞行
                 _isHoming = false;
@@ -90,16 +98,24 @@ namespace Controllers.Battle
             }
         }
         
+        /// <summary>
+        /// 检测碰撞
+        /// </summary>
         private void CheckCollision()
         {
-            //TODO：是否可以用自身碰撞体检测与敌人的碰撞
+            // 使用OverlapSphere检测碰撞
             Collider[] colliders = Physics.OverlapSphere(transform.position, _collisionRadius, _targetLayerMask);
             
-            foreach (var enemyCollider in colliders)
+            foreach (var collider in colliders)
             {
-                if (enemyCollider.TryGetComponent<Enemy.BaseEnemy>(out var enemy))
+                // 检查是否击中敌人
+                if (collider.gameObject == _context.target)
                 {
-                    enemy.TakeDamage(_damage);
+                    // 更新击中点
+                    _context.SetImpactPoint(transform.position);
+                    
+                    // 应用攻击属性
+                    _attackAttribute.ApplyAttribute(_context);
                     
                     // 子弹命中后失活
                     Deactivate();
@@ -117,7 +133,7 @@ namespace Controllers.Battle
         }
         
         /// <summary>
-        /// 子彈失效
+        /// 使子弹失活
         /// </summary>
         public void Deactivate()
         {

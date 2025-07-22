@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Module.Battle;
 using Module.Enums;
 using UnityEngine;
 
@@ -16,7 +17,6 @@ namespace Controllers.Battle
         [SerializeField] private bool _expandPoolIfNeeded = true;
         
         [Header("清理设置")]
-        [SerializeField] private float _bulletLifetime = 10f; // 子弹最大生命周期
         [SerializeField] private float _cleanupInterval = 5f; // 清理间隔
         
         // 子弹池，按预制体类型分类
@@ -50,19 +50,30 @@ namespace Controllers.Battle
             }
         }
         
-        public Bullet SpawnAndFireBullet(GameObject bulletPrefab, Vector3 spawnPosition, Transform target, 
-                                  int damage, DamageType damageType, float speed)
+        /// <summary>
+        /// 生成子弹
+        /// </summary>
+        /// <param name="context">攻击上下文</param>
+        /// <returns>生成的子弹实例</returns>
+        public Bullet SpawnBullet(AttackContext context)
         {
+            GameObject bulletPrefab = context.parameters.bulletPrefab;
+            if (bulletPrefab == null)
+            {
+                Debug.LogError("无法生成子弹：子弹预制体为空");
+                return null;
+            }
+            
             // 获取或创建子弹
             Bullet bullet = GetBulletFromPool(bulletPrefab);
             
             // 设置子弹位置
-            bullet.transform.position = spawnPosition;
+            bullet.transform.position = context.sourceModule.transform.position;
             bullet.transform.rotation = Quaternion.identity;
             bullet.gameObject.SetActive(true);
             
             // 初始化子弹属性
-            bullet.Initialize(target, damage, damageType, speed, _bulletLifetime);
+            bullet.Initialize(context);
             
             // 添加到活跃子弹列表
             _activeBullets.Add(bullet);
