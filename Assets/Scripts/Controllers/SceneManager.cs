@@ -20,6 +20,7 @@ namespace Controllers
         public GameObject moduleSelector;
         public GameObject battleManager;
         public GameObject buildController;
+        public GameObject bulletManager;
         
         [Header("当前场景名称")]
         public string currentScene;
@@ -46,6 +47,7 @@ namespace Controllers
             buildController.SetActive(true);
             moduleSelector.SetActive(true);
             battleManager.SetActive(false);
+            bulletManager.SetActive(false);
             currentScene = BuildingSceneName;
             OnSceneChanged?.Invoke(BuildingSceneName);
         }
@@ -56,6 +58,7 @@ namespace Controllers
             buildController.SetActive(false);
             moduleSelector.SetActive(false);
             battleManager.SetActive(true);
+            bulletManager.SetActive(true);
             currentScene = BattleSceneName;
             OnSceneChanged?.Invoke(BattleSceneName);
         }

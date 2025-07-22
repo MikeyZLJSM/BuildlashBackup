@@ -8,16 +8,25 @@ namespace Module.ModuleScript.Sphere
     public class CrystalBall : NormalSphere, IAttackable
     {
         [SerializeField] private float _attackRange = 5f;
+        [SerializeField] private GameObject _bulletPrefab; 
+        [SerializeField] private float _bulletSpeed = 10f; 
+        [SerializeField] private Transform _firePoint; 
         
         protected override void Awake()
         {
             base.Awake();
             
-            // 临时设置水晶球的战斗属性
+            // 设置水晶球的战斗属性
             _attackValue = 8;                            
             _damageType = DamageType.Magical;            
             _targetCount = TargetCount.SingleEnemy;      
-            _attackSpeed = 1.0f;                         
+            _attackSpeed = 1.0f;
+            
+            // 如果没有指定发射点，默认使用自身位置
+            if (_firePoint == null)
+            {
+                _firePoint = transform;
+            }
         }
         
         public AttackType GetAttackType()
@@ -57,6 +66,26 @@ namespace Module.ModuleScript.Sphere
             }
             
             return targets;
+        }
+        
+        public void FireBullet(GameObject target)
+        {
+            if (_bulletPrefab == null || target == null)
+            {
+                Debug.LogWarning("子弹预制体或目标为空");
+                return;
+            }
+            
+            // 统一调用子弹管理器生成子弹
+            Controllers.Battle.BulletManager.Instance.SpawnAndFireBullet(
+                _bulletPrefab,
+                _firePoint.position,
+                target.transform,
+                _attackValue,
+                _damageType,
+                _bulletSpeed
+            );
+            
         }
         
         private void OnDrawGizmosSelected()

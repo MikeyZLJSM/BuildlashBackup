@@ -237,7 +237,6 @@ namespace Controllers
                 if (hitNormal == faces[i].Normal && faces[i].CanAttach)
                 {
                     hitIntoAttachableFace = true;
-                    Debug.Log($"命中可拼接面：{faces[i].Normal} , 下标：{i}");
                     break;
                 }
             }

@@ -38,6 +38,7 @@ Transform:
   - {fileID: 300545833775354115}
   - {fileID: 319533220109370351}
   - {fileID: 1569415044851981803}
+  - {fileID: 5199371307012879704}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6697325877243262516
@@ -56,6 +57,7 @@ MonoBehaviour:
   moduleSelector: {fileID: 7933027128286786486}
   battleManager: {fileID: 3128967286042914225}
   buildController: {fileID: 5448743144640566493}
+  bulletManager: {fileID: 3226119188741463015}
   currentScene: 
 --- !u!1 &2955621848533515449
 GameObject:
@@ -171,9 +173,57 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerMaxHealth: 0
   PlayerCurrentHealth: 0
-  _registeredEnemies: []
   _defaultEnemyPrefab: {fileID: 3726564034667578554, guid: 2fc2cdbe59990714dae445daba5281e7, type: 3}
   _spawnHeightOffset: 0.5
+  _showAttackRanges: 0
+--- !u!1 &3226119188741463015
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5199371307012879704}
+  - component: {fileID: 2493269606609467652}
+  m_Layer: 0
+  m_Name: BulletManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5199371307012879704
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3226119188741463015}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -4.1207476, y: 20.195614, z: 9.189814}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6494599167456712336}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2493269606609467652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3226119188741463015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b3b5c0029e881f428f50658536d3562, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _initialPoolSize: 20
+  _expandPoolIfNeeded: 1
+  _bulletLifetime: 10
+  _cleanupInterval: 5
 --- !u!1 &3792786455414038872
 GameObject:
   m_ObjectHideFlags: 0

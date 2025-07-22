@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Enemy;
 using UnityEngine;
 using Module;
 using Module.Enums;
@@ -66,52 +67,51 @@ namespace Controllers.Battle
         }
         
         // 处理模块攻击逻辑
-        private void ProcessModuleAttack(BaseModule module, IAttackable attackable)
+        private void ProcessModuleAttack(BaseModule module, IAttackable attackingModule)
         {
             // 检查模块是否可以攻击
-            if (!attackable.CanAttack())
+            if (!attackingModule.CanAttack())
             {
                 return;
             }
             
             // 获取攻击范围内的目标
-            List<GameObject> targets = attackable.GetTargetsInRange();
+            List<GameObject> targets = attackingModule.GetTargetsInRange();
             if (targets == null || targets.Count == 0)
             {
                 return;
             }
             
             // 根据攻击类型执行不同的攻击逻辑
-            AttackType attackType = attackable.GetAttackType();
+            AttackType attackType = attackingModule.GetAttackType();
             
             // 根据模块的目标数量选择攻击方式
             switch (module._targetCount)
             {
                 case TargetCount.SingleEnemy:
                     // 单体攻击，只攻击第一个目标
-                    ExecuteAttack(module, targets[0]);
+                    ExecuteAttack(module, targets[0], attackingModule);
                     break;
                     
                 case TargetCount.MultipleEnemies:
                     // 群体攻击，攻击所有目标
                     foreach (var target in targets)
                     {
-                        ExecuteAttack(module, target);
+                        ExecuteAttack(module, target, attackingModule);
                     }
                     break;
             }
             
             // 攻击后开始冷却
-            attackable.StartAttackCD();
+            attackingModule.StartAttackCD();
         }
         
         // 执行单体攻击
-        private void ExecuteAttack(BaseModule module, GameObject target)
+        private void ExecuteAttack(BaseModule module, GameObject target, IAttackable attackingModule)
         {
-            if (target.TryGetComponent<Enemy.BaseEnemy>(out var enemy))
+            if (target.TryGetComponent<BaseEnemy>(out var enemy))
             {
-                // 应用伤害
-                enemy.TakeDamage(module._attackValue);
+                attackingModule.FireBullet(target);
                 
                 // 可以在这里添加攻击特效
                 Debug.Log($"{module.name} 对 {enemy.name} 造成了 {module._attackValue} 点{module._damageType}伤害");

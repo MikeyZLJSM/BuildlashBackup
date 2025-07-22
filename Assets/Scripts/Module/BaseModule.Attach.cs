@@ -202,8 +202,6 @@ namespace Module
 
             ModuleFace sourceFace = _attachableFaces[minIdx];
             
-            Debug.Log($"hitNormal: {targetNormal}");
-            
             ModuleFace[] targetFaces = targetModule._attachableFaces;
             ModuleFace targetFace = null;
             int targetFaceIdx = -1;
@@ -256,7 +254,6 @@ namespace Module
             if(!_attachableFaces[sourceFaceIdx].CanAttach) return;
             _attachableFaces[sourceFaceIdx].AttachedFace = targetModule._attachableFaces[targetFaceIdx];
             _attachableFaces[sourceFaceIdx].CanAttach = false;
-            Debug.Log($"已将{name}的{sourceFaceIdx}面CanAttach设置为{_attachableFaces[sourceFaceIdx].CanAttach}");
             
             targetModule.SetFaceAttachByIndex(targetFaceIdx, sourceFaceIdx, this);
         }

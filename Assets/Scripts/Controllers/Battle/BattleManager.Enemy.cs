@@ -105,7 +105,7 @@ namespace Controllers.Battle
                 UIController.Instance.UpdateHealthText(PlayerCurrentHealth, PlayerMaxHealth);
             }
             
-            Debug.Log($"玩家受到 {damage} 点伤害，血量: {PlayerCurrentHealth}/{PlayerMaxHealth}");
+            //Debug.Log($"玩家受到 {damage} 点伤害，血量: {PlayerCurrentHealth}/{PlayerMaxHealth}");
             
             if (PlayerCurrentHealth <= 0 && previousHealth > 0)
             {
