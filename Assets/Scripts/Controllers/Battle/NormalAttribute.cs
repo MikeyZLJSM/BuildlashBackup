@@ -1,8 +1,9 @@
 using Enemy;
 using Module.Battle;
+using Module.Interfaces;
 using UnityEngine;
 
-namespace Module.Interfaces.Attributes
+namespace Controllers.Battle
 {
     /// <summary>
     /// 普通攻击属性，无特殊效果

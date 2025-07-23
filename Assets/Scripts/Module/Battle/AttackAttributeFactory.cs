@@ -1,5 +1,5 @@
 using Module.Enums;
-using Module.Interfaces.Attributes;
+using Module.Interfaces;
 
 namespace Module.Battle
 {

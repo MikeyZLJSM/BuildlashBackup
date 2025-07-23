@@ -1,6 +1,6 @@
 using Module.Battle;
 
-namespace Module.Interfaces.Attributes
+namespace Module.Interfaces
 {
     /// <summary>
     /// 攻击属性接口，定义攻击属性的行为

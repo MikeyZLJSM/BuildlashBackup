@@ -37,6 +37,8 @@ namespace Module.ModuleScript.Sphere
                 _firePoint = transform;
             }
         }
+        
+        
 
         public bool CanAttack()
         {

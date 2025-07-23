@@ -7,6 +7,7 @@ namespace Module.Enums
     {
         None,           // 无特殊属性
         Splash,         // 范围溅射
-        Continuous      // 持续性生效
+        Continuous
+         // 持续性生效
     }
 } 

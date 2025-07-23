@@ -69,6 +69,9 @@ namespace Controllers.Battle
             {
                 return;
             }
+
+            // 获取原始攻击参数
+            AttackParameters parameters = attackable.GetAttackParameters();
             
             // 获取攻击范围内的目标
             List<GameObject> targets = attackable.GetTargetsInRange();
@@ -77,8 +80,6 @@ namespace Controllers.Battle
                 return;
             }
             
-            // 获取攻击参数
-            AttackParameters parameters = attackable.GetAttackParameters();
             
             switch (parameters.targetCount)
             {
@@ -95,6 +96,12 @@ namespace Controllers.Battle
             }
             
             attackable.StartAttackCD();
+        }
+        
+
+        private AttackParameters AttackModifier(AttackParameters  parameters)
+        {
+            return parameters;
         }
         
         private void UpdateModuleBattle()

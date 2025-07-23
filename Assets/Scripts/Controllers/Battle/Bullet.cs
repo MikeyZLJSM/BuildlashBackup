@@ -1,7 +1,7 @@
 using System;
 using Module.Battle;
 using Module.Enums;
-using Module.Interfaces.Attributes;
+using Module.Interfaces;
 using UnityEngine;
 
 namespace Controllers.Battle
@@ -114,7 +114,7 @@ namespace Controllers.Battle
                     // 更新击中点
                     _context.SetImpactPoint(transform.position);
                     
-                    // 应用攻击属性
+                    // TODO: 通知应用攻击属性
                     _attackAttribute.ApplyAttribute(_context);
                     
                     // 子弹命中后失活
