@@ -10,8 +10,9 @@ namespace Module.Battle
     [Serializable]
     public class AttackParameters
     {
-        [SerializeField] public TargetMovement targetMovementType = TargetMovement.Any;
-        [SerializeField] public TargetCount targetCount = TargetCount.SingleEnemy;
+        [SerializeField] public TargetLockType targetLockType = TargetLockType.Nearest;
+        [SerializeField] public int bulletCount = 1;
+        [SerializeField] public int targetCount = 1;
         [SerializeField] public DamageType damageType = DamageType.Physical;
         [SerializeField] public AttackAttribute attackAttribute = AttackAttribute.None;
         [SerializeField] public int damage = 10;
@@ -36,7 +37,8 @@ namespace Module.Battle
         {
             return new AttackParameters
             {
-                targetMovementType = this.targetMovementType,
+                targetLockType = this.targetLockType,
+                bulletCount = this.bulletCount,
                 targetCount = this.targetCount,
                 damageType = this.damageType,
                 attackAttribute = this.attackAttribute,

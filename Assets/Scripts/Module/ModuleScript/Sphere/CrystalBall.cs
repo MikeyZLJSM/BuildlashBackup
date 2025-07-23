@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Enemy;
 using Module.Battle;
 using Module.Enums;
 using Module.Interfaces;
@@ -10,9 +11,9 @@ namespace Module.ModuleScript.Sphere
     {
         [SerializeField] private float _attackRange = 5f;
         [SerializeField] private GameObject _bulletPrefab; // 子弹预制体
-        [SerializeField] private float _bulletSpeed = 10f; // 子弹飞行速度
         [SerializeField] private Transform _firePoint; // 发射点
         
+        private AttackParameters _modifiedAttackParameters;
         
         protected override void Awake()
         {
@@ -21,14 +22,15 @@ namespace Module.ModuleScript.Sphere
             // 初始化攻击参数
             _attackParameters = new AttackParameters
             {
-                targetMovementType = TargetMovement.Any,
-                targetCount = TargetCount.SingleEnemy,
+                targetLockType = TargetLockType.Nearest,
+                bulletCount = 2,
+                targetCount = 2,
                 damageType = DamageType.Magical,
                 attackAttribute = AttackAttribute.None,
                 damage = 8,
                 attackSpeed = 1.0f,
                 attackRange = _attackRange,
-                bulletSpeed = _bulletSpeed,
+                bulletSpeed = 10f,
                 bulletPrefab = _bulletPrefab
             };
             
@@ -39,7 +41,6 @@ namespace Module.ModuleScript.Sphere
         }
         
         
-
         public bool CanAttack()
         {
             return _canAttack;
@@ -59,13 +60,13 @@ namespace Module.ModuleScript.Sphere
             Collider[] colliders = Physics.OverlapSphere(
                 transform.position, 
                 _attackRange, 
-                LayerMask.GetMask("Enemy")
+                1 << 8 
             );
             
             // 添加找到的敌人到目标列表
             foreach (var enemyCollider in colliders)
             {
-                if (enemyCollider.TryGetComponent<Enemy.BaseEnemy>(out _))
+                if (enemyCollider.TryGetComponent<BaseEnemy>(out _))
                 {
                     targets.Add(enemyCollider.gameObject);
                 }
@@ -92,7 +93,7 @@ namespace Module.ModuleScript.Sphere
             AttackContext context = new AttackContext(this, target, GetAttackParameters());
             
             // 调用子弹管理器生成子弹
-            Controllers.Battle.BulletManager.Instance.SpawnBullet(context);
+            StartCoroutine(Controllers.Battle.BulletManager.Instance.SpawnBullets(context));
         }
         
         private void OnDrawGizmosSelected()

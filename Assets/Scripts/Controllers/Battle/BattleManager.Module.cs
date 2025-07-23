@@ -72,6 +72,7 @@ namespace Controllers.Battle
 
             // 获取原始攻击参数
             AttackParameters parameters = attackable.GetAttackParameters();
+            var newParameters = AttackModifier(parameters);
             
             // 获取攻击范围内的目标
             List<GameObject> targets = attackable.GetTargetsInRange();
@@ -79,21 +80,29 @@ namespace Controllers.Battle
             {
                 return;
             }
-            
-            
-            switch (parameters.targetCount)
+
+            if (parameters.targetCount == 1)
             {
-                case TargetCount.SingleEnemy:
-                    attackable.ExecuteAttack(targets[0]);
-                    break;
-                    
-                case TargetCount.MultipleEnemies:
+                attackable.ExecuteAttack(targets[0]);
+            }
+            else if(parameters.targetCount > 1)
+            {
+                if (targets.Count < parameters.targetCount)
+                {
                     foreach (var target in targets)
                     {
                         attackable.ExecuteAttack(target);
                     }
-                    break;
+                }
+                else
+                {
+                    for (int i = 0; i < parameters.targetCount; i++)
+                    {
+                        attackable.ExecuteAttack(targets[i]);
+                    }
+                }
             }
+            
             
             attackable.StartAttackCD();
         }

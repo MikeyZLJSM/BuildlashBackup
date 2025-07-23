@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Module.Battle;
 using Module.Enums;
@@ -55,13 +56,23 @@ namespace Controllers.Battle
         /// </summary>
         /// <param name="context">攻击上下文</param>
         /// <returns>生成的子弹实例</returns>
-        public Bullet SpawnBullet(AttackContext context)
+        public IEnumerator SpawnBullets(AttackContext context)
+        {
+            int bulletCount = context.parameters.bulletCount;
+            
+            for (int i = 0; i < bulletCount; i++)
+            {
+                SpawnBullet(context);
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+        
+        private void SpawnBullet(AttackContext context)
         {
             GameObject bulletPrefab = context.parameters.bulletPrefab;
-            if (bulletPrefab == null)
+            if (!bulletPrefab)
             {
                 Debug.LogError("无法生成子弹：子弹预制体为空");
-                return null;
             }
             
             // 获取或创建子弹
@@ -77,8 +88,6 @@ namespace Controllers.Battle
             
             // 添加到活跃子弹列表
             _activeBullets.Add(bullet);
-            
-            return bullet;
         }
         
         private Bullet GetBulletFromPool(GameObject bulletPrefab)
