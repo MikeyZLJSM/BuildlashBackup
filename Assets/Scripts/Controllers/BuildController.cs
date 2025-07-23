@@ -18,14 +18,9 @@ namespace Controllers
 
         [SerializeField] private ModuleSelector _moduleSelector;
         
-        [SerializeField, Header("插槽的层级")] 
-        private int socketLayer = 8;
+        [SerializeField, Header("模块的层级")] private int moduleLayer = 7;    
         
-        [SerializeField, Header("模块的层级")] 
-        private int moduleLayer = 7;    
-        
-        [Header("删除键"), SerializeField] 
-        private KeyCode removeButton = KeyCode.E;
+        [Header("删除键"), SerializeField] private KeyCode removeButton = KeyCode.E;
 
         [Header("拼接预览")]
         private GameObject _previewObject;
@@ -34,11 +29,7 @@ namespace Controllers
 
         private void Awake()
         {
-            if (Instance != null) 
-            {
-                Destroy(gameObject);
-                return;
-            }
+            if (Instance is not null) return;
             Instance = this;
         }
 
@@ -246,7 +237,6 @@ namespace Controllers
                 if (hitNormal == faces[i].Normal && faces[i].CanAttach)
                 {
                     hitIntoAttachableFace = true;
-                    Debug.Log($"命中可拼接面：{faces[i].Normal} , 下标：{i}");
                     break;
                 }
             }

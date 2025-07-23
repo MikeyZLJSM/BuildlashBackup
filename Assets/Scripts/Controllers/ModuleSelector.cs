@@ -23,7 +23,13 @@ namespace Controllers
         // 事件：当模块选择状态改变时触发
         public event Action<BaseModule> OnModuleSelected;
         public event Action<BaseModule> OnModuleDeselected;
-
+        
+        public static ModuleSelector Instance { get; private set; }
+        public void Awake()
+        {
+            if (Instance is null) return;
+            Instance = this;
+        }
         private void SelectModule(BaseModule module)
         {
             if (module == null) return;
