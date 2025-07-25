@@ -2863,6 +2863,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 209218709305173189, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 42f4d915b3003d84590c5a1efe276df1, type: 2}
+    - target: {fileID: 209218709305173189, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1275656619801538170, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
       propertyPath: enterBattleButton
       value: 
@@ -2983,6 +2991,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4434155733946867755, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 42f4d915b3003d84590c5a1efe276df1, type: 2}
+    - target: {fileID: 4434155733946867755, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -8566525483848717197, guid: 42f4d915b3003d84590c5a1efe276df1, type: 2}
+    - target: {fileID: 4434155733946867755, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5896581588603489587, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -3062,6 +3082,14 @@ PrefabInstance:
     - target: {fileID: 7332867123889674995, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7506343947026172582, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 42f4d915b3003d84590c5a1efe276df1, type: 2}
+    - target: {fileID: 7506343947026172582, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8330369846539666117, guid: 595e701b550d8c94fb73d74d5254169e, type: 3}
       propertyPath: m_AnchorMax.x
