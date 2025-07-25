@@ -1,6 +1,11 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/CODE_STRUCTURE_SUMMARY.md.meta
 guid: 3fbb8f0c07a7f18428948c6bef24a9ca
 TextScriptImporter:
+========
+guid: 42f4d915b3003d84590c5a1efe276df1
+NativeFormatImporter:
+>>>>>>>> 6eb1974 (修复字体，增加可供ai使用的说明文档):Assets/Scripts/SourceHanSansSC-Regular-2 SDF.asset.meta
   externalObjects: {}
   userData: 
   assetBundleName: 
