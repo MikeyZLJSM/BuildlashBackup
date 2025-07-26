@@ -312,7 +312,7 @@ namespace Controllers
                 );
 
                 // 检查模块是否具有IAttackable接口
-                isAttackModule = module.GetComponent<IAttackable>() != null;
+                isAttackModule = module.GetComponent<BaseAttackModule>();
             }
         }
     }

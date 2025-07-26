@@ -18,6 +18,8 @@ namespace Module.Battle
         [SerializeField] public int damage = 10;
         [SerializeField] public float attackSpeed = 1.0f;
         [SerializeField] public float attackRange = 5.0f;
+        [SerializeField] public float attackCD;
+        [SerializeField] public bool canAttack;
         [SerializeField] public float bulletSpeed = 10.0f;
         [SerializeField] public GameObject bulletPrefab;
         

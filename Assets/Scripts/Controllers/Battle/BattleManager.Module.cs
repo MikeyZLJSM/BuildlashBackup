@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Module;
 using Module.Battle;
-using Module.Enums;
-using Module.Interfaces;
 
 namespace Controllers.Battle
 {
@@ -35,13 +33,13 @@ namespace Controllers.Battle
         {
             foreach (var module in _battleModules)
             {
-                UpdateModuleCD(module);
+                UpdateAttackModuleCD(module);
             }
             
             // 处理攻击模块的逻辑
             foreach (var module in _battleModules)
             {
-                if (module is IAttackable attackable)
+                if (module is BaseAttackModule attackable)
                 {
                     ProcessModuleAttack(module, attackable);
                 }
@@ -49,20 +47,18 @@ namespace Controllers.Battle
         }
         
         // 更新模块冷却时间
-        private void UpdateModuleCD(BaseModule module)
+        private void UpdateAttackModuleCD(BaseModule module)
         {
-            if (module._attackCD >= 0)
+            if (module is not BaseAttackModule attackable || !(attackable.AttackParameters.attackCD >= 0)) return;
+            attackable.AttackParameters.attackCD -= Time.deltaTime;
+            if (attackable.AttackParameters.attackCD <= 0)
             {
-                module._attackCD -= Time.deltaTime;
-                if (module._attackCD <= 0)
-                {
-                    module._canAttack = true;
-                }
+                attackable.AttackParameters.canAttack = true;
             }
         }
         
         // 处理模块攻击逻辑
-        private void ProcessModuleAttack(BaseModule module, IAttackable attackable)
+        private void ProcessModuleAttack(BaseModule module, BaseAttackModule attackable)
         {
             if (!attackable.CanAttack())
             {

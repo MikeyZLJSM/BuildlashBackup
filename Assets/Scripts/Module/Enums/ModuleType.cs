@@ -5,7 +5,7 @@
         BaseCube = 0,
         NormalCube = 1,
         NormalCylinder = 2,
-        NormalSphere = 3,
+        Sphere = 3,
         NormalCone = 4
     }
 }

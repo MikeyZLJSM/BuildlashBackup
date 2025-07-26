@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using Enemy;
 using Module.Battle;
 using Module.Enums;
-using Module.Interfaces;
 using UnityEngine;
 
-namespace Module.ModuleScript.Sphere
+namespace Module.ModuleScript.Cone
 {
-    public class CrystalBall : Sphere
+    public class Volcano : NormalCone
     {
         protected override void Awake()
         {
@@ -17,14 +14,14 @@ namespace Module.ModuleScript.Sphere
             AttackParameters = new AttackParameters
             {
                 targetLockType = TargetLockType.Nearest,
-                bulletCount = 2,
-                targetCount = 2,
+                bulletCount = 1,
+                targetCount = 4,
                 damageType = DamageType.Magical,
                 attackAttribute = AttackAttribute.None,
                 damage = 8,
-                attackSpeed = 1.0f,
+                attackSpeed = 0.25f,
                 attackRange = 20f,
-                bulletSpeed = 10f,
+                bulletSpeed = 15f,
                 bulletPrefab = _bulletPrefab
             };
             
@@ -42,12 +39,9 @@ namespace Module.ModuleScript.Sphere
                 return;
             }
             
-            // 创建攻击上下文
             AttackContext context = new AttackContext(this, target, GetAttackParameters());
             
-            // 调用子弹管理器生成子弹
             StartCoroutine(Controllers.Battle.BulletManager.Instance.SpawnBullets(context));
         }
-        
     }
 }
