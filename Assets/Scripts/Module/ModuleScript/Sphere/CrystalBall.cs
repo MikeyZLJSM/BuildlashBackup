@@ -17,8 +17,8 @@ namespace Module.ModuleScript.Sphere
             AttackParameters = new AttackParameters
             {
                 targetLockType = TargetLockType.Nearest,
-                bulletCount = 2,
-                targetCount = 2,
+                bulletCount = 1,
+                targetCount = 1,
                 damageType = DamageType.Magical,
                 attackAttribute = AttackAttribute.None,
                 damage = 8,
@@ -32,21 +32,6 @@ namespace Module.ModuleScript.Sphere
             {
                 _firePoint = transform;
             }
-        }
-        
-        public override void ExecuteAttack(GameObject target)
-        {
-            if (!_bulletPrefab || !target)
-            {
-                Debug.LogWarning("子弹预制体或目标为空，无法发射子弹");
-                return;
-            }
-            
-            // 创建攻击上下文
-            AttackContext context = new AttackContext(this, target, GetAttackParameters());
-            
-            // 调用子弹管理器生成子弹
-            StartCoroutine(Controllers.Battle.BulletManager.Instance.SpawnBullets(context));
         }
         
     }

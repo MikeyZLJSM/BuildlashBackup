@@ -15,6 +15,13 @@ namespace Module.Battle
                 case AttackAttribute.None:
                     return new NormalAttribute();
                 
+                case AttackAttribute.Splash:
+                    return new SplashAttribute();
+                
+                case AttackAttribute.Continuous:
+                    // TODO: 实现持续性伤害属性
+                    return new NormalAttribute();
+                
                 default:
                     return new NormalAttribute();
             }

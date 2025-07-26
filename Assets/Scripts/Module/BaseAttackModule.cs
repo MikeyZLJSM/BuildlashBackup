@@ -26,7 +26,20 @@ namespace Module
             return AttackParameters.Clone();
         }
 
-        public abstract void ExecuteAttack(GameObject target);
+        public void ExecuteAttack(GameObject target)
+        {
+            if (!_bulletPrefab || !target)
+            {
+                Debug.LogWarning("子弹预制体或目标为空，无法发射子弹");
+                return;
+            }
+            
+            // 创建攻击上下文
+            AttackContext context = new AttackContext(this, target, GetAttackParameters());
+            
+            // 调用子弹管理器生成子弹
+            StartCoroutine(Controllers.Battle.BulletManager.Instance.SpawnBullets(context));
+        }
         
          public List<GameObject> GetTargetsInRange()
         {
