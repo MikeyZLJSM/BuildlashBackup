@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Module;
 using Module.Battle;
+using Module.Interfaces;
 
 namespace Controllers.Battle
 {
@@ -10,6 +11,12 @@ namespace Controllers.Battle
     {
         // 具有战斗行为的模块列表
         private List<BaseModule> _battleModules = new List<BaseModule>();
+
+        private void HandleBulletHit(AttackContext context)
+        {
+            IAttackAttribute attackAttribute = AttackAttributeFactory.CreateAttribute(context.parameters.attackAttribute);
+            attackAttribute.ApplyAttribute(context);
+        }
         
         public void InitializeModuleBattleSystem()
         {
