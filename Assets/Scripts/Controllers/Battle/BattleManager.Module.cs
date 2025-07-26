@@ -64,17 +64,15 @@ namespace Controllers.Battle
         // 处理模块攻击逻辑
         private void ProcessModuleAttack(BaseModule module, IAttackable attackable)
         {
-            // 检查模块是否可以攻击
             if (!attackable.CanAttack())
             {
                 return;
             }
 
-            // 获取原始攻击参数
+            // 获取原始攻击参数，使用AttackModifier装饰器修改
             AttackParameters parameters = attackable.GetAttackParameters();
             var newParameters = AttackModifier(parameters);
             
-            // 获取攻击范围内的目标
             List<GameObject> targets = attackable.GetTargetsInRange();
             if (targets == null || targets.Count == 0)
             {
