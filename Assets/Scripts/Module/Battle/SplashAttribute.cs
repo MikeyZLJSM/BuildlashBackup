@@ -71,6 +71,14 @@ namespace Module.Battle
                 }
             }
             
+            // 可视化溅射范围（仅在编辑器中）
+            #if UNITY_EDITOR
+            Debug.DrawLine(impactPoint, impactPoint + Vector3.up * splashRadius, Color.red, 1f);
+            Debug.DrawLine(impactPoint, impactPoint + Vector3.right * splashRadius, Color.red, 1f);
+            Debug.DrawLine(impactPoint, impactPoint + Vector3.left * splashRadius, Color.red, 1f);
+            Debug.DrawLine(impactPoint, impactPoint + Vector3.forward * splashRadius, Color.red, 1f);
+            Debug.DrawLine(impactPoint, impactPoint + Vector3.back * splashRadius, Color.red, 1f);
+            #endif
         }
         
         /// <summary>
