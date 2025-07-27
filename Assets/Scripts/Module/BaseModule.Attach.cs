@@ -233,15 +233,13 @@ namespace Module
             targetModule.AddChildModuleToList(this);
             SetPhysicsAttached(true);
 
+            if (isPreview || targetFace == null) return false;
+          
+            SetFaceAttachByIndex(minIdx, targetFaceIdx, targetModule);
             // 7. 通知ModulesManager模块已拼接
-            if (ModulesManager.Instance != null)
+            if (ModulesManager.Instance)
             {
                 ModulesManager.Instance.OnModuleAttached(targetModule, this);
-            }
-
-            if (!isPreview && targetFace != null)
-            {
-                SetFaceAttachByIndex(minIdx, targetFaceIdx, targetModule);
             }
 
             return true;

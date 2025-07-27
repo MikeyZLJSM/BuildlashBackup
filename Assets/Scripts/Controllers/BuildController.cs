@@ -266,7 +266,6 @@ namespace Controllers
                     if (bestIdx < 0) return;
                     Vector3 targetFaceCenter = faces[bestIdx].Center;
                     bool ok = fromAttach.AttachToFace(targetModule, targetNormal.normalized, targetFaceCenter, hit.point);
-                    //Debug.Log($"拼接结果参数：目标模块：{targetModule.name}，法向量：{targetNormal.normalized}，中心点：{targetFaceCenter}，射线检测点：{hit.point}");
                     if (ok)
                     {
                         _moduleSelector.DeselectModule();

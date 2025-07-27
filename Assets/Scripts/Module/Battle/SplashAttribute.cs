@@ -6,10 +6,13 @@ using UnityEngine;
 namespace Module.Battle
 {
     /// <summary>
-    /// 溅射攻击属性，以命中
+    /// 溅射攻击属性，对命中点周围区域内的敌人造成伤害
     /// </summary>
     public class SplashAttribute : IAttackAttribute
     {
+        // 溅射效果预制体
+        private static GameObject _splashEffectPrefab;
+        
         public void ApplyAttribute(AttackContext context)
         {
             // 主目标造成直接命中伤害
@@ -28,6 +31,9 @@ namespace Module.Battle
             
             // 获取命中点
             Vector3 impactPoint = context.impactPoint;
+            
+            // 创建溅射效果可视化
+            CreateSplashVisualEffect(impactPoint, splashRadius);
             
             Collider[] colliders = Physics.OverlapSphere(impactPoint, splashRadius, 1 << 8); 
             
@@ -49,10 +55,10 @@ namespace Module.Battle
                 
                 if (enemyObject.TryGetComponent<BaseEnemy>(out var enemy))
                 {
-                    // 根据伤害系数计算伤害
+                    // 计算距离，用于伤害衰减
                     float distance = Vector3.Distance(impactPoint, enemyObject.transform.position);
-                    float damageFactor = 1f - (distance / splashRadius); 
-                    damageFactor = Mathf.Clamp(damageFactor, 0.5f, 1f); // 保底百分之30伤害
+                    float damageFactor = 1f - (distance / splashRadius); // 距离越远，伤害越低
+                    damageFactor = Mathf.Clamp(damageFactor, 0.3f, 1f); // 确保最低造成30%的伤害
                     
                     // 计算溅射伤害
                     int splashDamage = Mathf.RoundToInt(context.parameters.damage * damageFactor);
@@ -65,6 +71,44 @@ namespace Module.Battle
                 }
             }
             
+        }
+        
+        /// <summary>
+        /// 创建溅射伤害的可视化效果
+        /// </summary>
+        private void CreateSplashVisualEffect(Vector3 position, float radius)
+        {
+            // 创建一个临时的可视化效果
+            GameObject visualEffect = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            visualEffect.transform.position = position;
+            visualEffect.transform.localScale = new Vector3(radius * 2, radius * 2, radius * 2);
+            
+            // 设置材质为半透明
+            Renderer renderer = visualEffect.GetComponent<Renderer>();
+            if (renderer)
+            {
+                Material material = new Material(Shader.Find("Standard"));
+                material.color = new Color(1f, 0.5f, 0f, 0.3f); // 橙色半透明
+                material.SetFloat("_Mode", 3); // 设置为透明模式
+                material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                material.SetInt("_ZWrite", 0);
+                material.DisableKeyword("_ALPHATEST_ON");
+                material.EnableKeyword("_ALPHABLEND_ON");
+                material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                material.renderQueue = 3000;
+                renderer.material = material;
+            }
+            
+            // 禁用碰撞器
+            Collider collider = visualEffect.GetComponent<Collider>();
+            if (collider)
+            {
+                collider.enabled = false;
+            }
+            
+            // 一段时间后销毁
+            GameObject.Destroy(visualEffect, 0.5f);
         }
     }
 } 
