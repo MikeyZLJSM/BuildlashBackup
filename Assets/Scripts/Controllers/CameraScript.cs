@@ -5,15 +5,20 @@ namespace Controllers
 {
     public class CameraScript : MonoBehaviour
     {
-        [Header("围绕的物体")] public Transform cenObj; //围绕的物体
+        public Transform cenObj => ModulesManager.Instance.GetCenterModule().transform;//围绕的物体
 
         [Header("旋转速度")] public float rotationSpeed = 5f; //旋转速度
 
         [Header("鼠标滚轮缩放速度")] public float moveSpeed = 1f; //前后移动速度
 
         private Vector3 _rotionTransform;
-        private new Camera camera;
-
+        public Camera camera { get; private set; }
+        public static CameraScript Instance { get; private set; }
+        public void Awake()
+        {
+            if (Instance is not null) return;
+            Instance = this;
+        }
         private void Start()
         {
             camera = GetComponent<Camera>();

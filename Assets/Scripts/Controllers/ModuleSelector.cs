@@ -23,7 +23,13 @@ namespace Controllers
         // 事件：当模块选择状态改变时触发
         public event Action<BaseModule> OnModuleSelected;
         public event Action<BaseModule> OnModuleDeselected;
-
+        
+        public static ModuleSelector Instance { get; private set; }
+        public void Awake()
+        {
+            if (Instance is null) return;
+            Instance = this;
+        }
         private void SelectModule(BaseModule module)
         {
             if (module == null) return;
@@ -38,8 +44,6 @@ namespace Controllers
                 _originalColor = _selectedRenderer.material.color;
                 _selectedRenderer.material.color = selectedColor;
             }
-
-            Debug.Log($"选中模块: {SelectedModule.moduleType}");
 
             // 触发选择事件
             OnModuleSelected?.Invoke(SelectedModule);
@@ -57,7 +61,7 @@ namespace Controllers
             SelectedModule = null;
             _selectedRenderer = null;
 
-            Debug.Log("取消模块选择");
+            //Debug.Log("取消模块选择");
 
             // 触发取消选择事件
             OnModuleDeselected?.Invoke(previousModule);

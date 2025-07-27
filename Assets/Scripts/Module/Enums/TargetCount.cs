@@ -4,6 +4,5 @@
     {
         SingleEnemy,
         MultipleEnemies,
-        SplashAttack
     }
 }
