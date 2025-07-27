@@ -29,14 +29,14 @@ namespace Enemy.EnemyScript
         /// <summary>初始化移动策略 - 配置直线移动</summary>
         protected override void InitializeMovementStrategy()
         {
-            var straightMovement = new StraightMovement();
+            StraightMovement straightMovement = new StraightMovement();
             SetMovementStrategy(straightMovement);
         }
         
         /// <summary>初始化攻击策略 - 配置近战攻击</summary>
         protected override void InitializeAttackStrategy()
         {
-            var meleeAttack = new MeleeAttack();
+            MeleeAttack meleeAttack = new MeleeAttack();
             meleeAttack.SetAttackParameters(attackRange, attackCooldown);
             SetAttackStrategy(meleeAttack);
         }

@@ -53,7 +53,7 @@ namespace Controllers
         {
             if (SelectedModule == null) return;
 
-            var previousModule = SelectedModule;
+            BaseModule previousModule = SelectedModule;
 
             if (_selectedRenderer != null) _selectedRenderer.material.color = _originalColor;
 

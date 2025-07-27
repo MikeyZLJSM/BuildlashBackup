@@ -39,6 +39,7 @@ Transform:
   - {fileID: 319533220109370351}
   - {fileID: 1569415044851981803}
   - {fileID: 5199371307012879704}
+  - {fileID: 5262802862710693758}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6697325877243262516
@@ -175,7 +176,6 @@ MonoBehaviour:
   PlayerCurrentHealth: 0
   _defaultEnemyPrefab: {fileID: 3726564034667578554, guid: 2fc2cdbe59990714dae445daba5281e7, type: 3}
   _spawnHeightOffset: 0.5
-  _showAttackRanges: 0
 --- !u!1 &3226119188741463015
 GameObject:
   m_ObjectHideFlags: 0
@@ -222,7 +222,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _initialPoolSize: 20
   _expandPoolIfNeeded: 1
-  _bulletLifetime: 10
   _cleanupInterval: 5
 --- !u!1 &3792786455414038872
 GameObject:
@@ -425,6 +424,50 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &5066528724911912472
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5262802862710693758}
+  - component: {fileID: 5429383483713989574}
+  m_Layer: 0
+  m_Name: ConfigManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5262802862710693758
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066528724911912472}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6494599167456712336}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5429383483713989574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5066528724911912472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85b05b1c235649a486e86fa8cda32097, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5448743144640566493
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,7 +484,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &300545833775354115
 Transform:
   m_ObjectHideFlags: 0
@@ -626,11 +669,9 @@ MonoBehaviour:
   centerModule: {fileID: 0}
   assembledModules: []
   gridSize: 1
-  enableAttack: 1
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 256
-  globalAttackRange: 10
   showDebugInfo: 1
 --- !u!1 &7933027128286786486
 GameObject:
@@ -648,7 +689,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &319533220109370351
 Transform:
   m_ObjectHideFlags: 0

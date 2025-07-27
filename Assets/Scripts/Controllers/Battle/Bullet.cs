@@ -103,7 +103,7 @@ namespace Controllers.Battle
             // 使用OverlapSphere检测碰撞
             Collider[] colliders = Physics.OverlapSphere(transform.position, _collisionRadius, _targetLayerMask);
             
-            foreach (var collider in colliders)
+            foreach (Collider collider in colliders)
             {
                 // 检查是否击中敌人
                 if (collider.gameObject == _context.target)

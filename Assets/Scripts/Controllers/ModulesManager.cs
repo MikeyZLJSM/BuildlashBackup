@@ -32,7 +32,7 @@ namespace Controllers
         {
             if (Instance is not null) return;
                 Instance = this;
-                DontDestroyOnLoad(gameObject);
+                
         }
         
         private void Start()
