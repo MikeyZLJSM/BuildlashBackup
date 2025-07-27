@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using Enemy;
 using Module.Battle;
 using Module.Enums;
-using Module.Interfaces;
 using UnityEngine;
 
-namespace Module.ModuleScript.Sphere
+namespace Module.ModuleScript.Cone
 {
-    public class CrystalBall : Sphere
+    public class Volcano : NormalCone
     {
         protected override void Awake()
         {
@@ -18,13 +15,13 @@ namespace Module.ModuleScript.Sphere
             {
                 targetLockType = TargetLockType.Nearest,
                 bulletCount = 1,
-                targetCount = 1,
+                targetCount = 4,
                 damageType = DamageType.Magical,
                 attackAttribute = AttackAttribute.None,
-                damage = 8,
-                attackSpeed = 1.0f,
+                damage = 6,
+                attackSpeed = 0.25f,
                 attackRange = 20f,
-                bulletSpeed = 10f,
+                bulletSpeed = 15f,
                 bulletPrefab = _bulletPrefab
             };
             

@@ -3,6 +3,7 @@ using Module.Battle;
 using Module.Enums;
 using Module.Interfaces;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Controllers.Battle
 {
@@ -24,15 +25,14 @@ namespace Controllers.Battle
         private float _lifetime;
         private float _spawnTime;
         
-        // 攻击属性实现
-        private IAttackAttribute _attackAttribute;
-        
         // 状态
         private bool _isInitialized = false;
         private bool _isHoming = true; // 是否追踪目标
         
         // 回调
         public Action OnDeactivate { get; set; }
+        
+        public static event Action<AttackContext> OnBulletHit;
         
         /// <summary>
         /// 初始化子弹属性
@@ -46,9 +46,6 @@ namespace Controllers.Battle
             _spawnTime = Time.time;
             _isInitialized = true;
             _isHoming = true;
-            
-            // 创建攻击属性实现
-            _attackAttribute = AttackAttributeFactory.CreateAttribute(context.parameters.attackAttribute);
             
             // 设置子弹朝向目标
             if (_target)
@@ -114,8 +111,8 @@ namespace Controllers.Battle
                     // 更新击中点
                     _context.SetImpactPoint(transform.position);
                     
-                    // TODO: 通知应用攻击属性
-                    _attackAttribute.ApplyAttribute(_context);
+                    // 触发击中事件
+                    OnBulletHit?.Invoke(_context);
                     
                     // 子弹命中后失活
                     Deactivate();

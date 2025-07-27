@@ -18,14 +18,12 @@ namespace Module
     public abstract partial class BaseModule : MonoBehaviour, IAttachable
     {
         public ModuleType moduleType;
-        public float moduleMass = 1f;
-        public BaseModule parentModule;
-        public List<BaseModule> _childModules = new List<BaseModule>();
-        
-        public ModuleFace[] _attachableFaces;
+        [HideInInspector] public float moduleMass = 1f;
+        [HideInInspector] public BaseModule parentModule;
+        [HideInInspector] public List<BaseModule> _childModules = new List<BaseModule>();
+        [HideInInspector] public ModuleFace[] _attachableFaces;
 
         protected Rigidbody _rb;
-        
         protected BoxCollider _faceDetectCollider;
 
         protected virtual void Awake()
@@ -235,15 +233,13 @@ namespace Module
             targetModule.AddChildModuleToList(this);
             SetPhysicsAttached(true);
 
+            if (isPreview || targetFace == null) return false;
+          
+            SetFaceAttachByIndex(minIdx, targetFaceIdx, targetModule);
             // 7. 通知ModulesManager模块已拼接
-            if (ModulesManager.Instance != null)
+            if (ModulesManager.Instance)
             {
                 ModulesManager.Instance.OnModuleAttached(targetModule, this);
-            }
-
-            if (!isPreview && targetFace != null)
-            {
-                SetFaceAttachByIndex(minIdx, targetFaceIdx, targetModule);
             }
 
             return true;

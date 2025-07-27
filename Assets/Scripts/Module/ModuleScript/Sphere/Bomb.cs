@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Module.ModuleScript.Sphere
 {
-    public class CrystalBall : Sphere
+    public class Bomb : Sphere
     {
         protected override void Awake()
         {
@@ -20,11 +20,12 @@ namespace Module.ModuleScript.Sphere
                 bulletCount = 1,
                 targetCount = 1,
                 damageType = DamageType.Magical,
-                attackAttribute = AttackAttribute.None,
-                damage = 8,
-                attackSpeed = 1.0f,
+                attackAttribute = AttackAttribute.Splash,
+                SplashRadius = 4f,
+                damage = 6,
+                attackSpeed = 0.5f,
                 attackRange = 20f,
-                bulletSpeed = 10f,
+                bulletSpeed = 15f,
                 bulletPrefab = _bulletPrefab
             };
             

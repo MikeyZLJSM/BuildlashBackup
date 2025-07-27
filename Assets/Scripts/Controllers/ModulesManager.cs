@@ -153,6 +153,18 @@ namespace Controllers
             return null;
         }
 
+        /// <summary> 根据模块获取模块信息 </summary>
+        /// <param name = "module" > 模块 </param>
+        /// <returns> 模块信息 </returns>
+        public ModuleInfo GetModuleInfoByModule(BaseModule module)
+        {
+            foreach (ModuleInfo moduleInfo in assembledModules)
+                if (moduleInfo.module == module)
+                    return moduleInfo;
+
+            return null;
+        }
+
         /// <summary> 检查指定网格位置是否有模块 </summary>
         /// <param name = "gridOffset" > 网格偏移量 </param>
         /// <returns> 是否有模块 </returns>
@@ -299,7 +311,8 @@ namespace Controllers
                     Mathf.RoundToInt(relativePosition.z / gridSize)
                 );
 
-                isAttackModule = module is IAttackable;
+                // 检查模块是否具有IAttackable接口
+                isAttackModule = module.GetComponent<BaseAttackModule>();
             }
         }
     }

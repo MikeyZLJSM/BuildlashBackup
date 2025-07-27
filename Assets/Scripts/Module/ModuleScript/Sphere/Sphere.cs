@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace Module.ModuleScript.Sphere
 {
-    public class NormalSphere : BaseModule
+    public abstract class Sphere : BaseAttackModule
     {
         protected override void Awake()
         {
             base.Awake();
-            moduleType = ModuleType.NormalSphere;
+            moduleType = ModuleType.Sphere;
         }
 
         public override ModuleFace[] GetAttachableFaces()
@@ -22,5 +22,6 @@ namespace Module.ModuleScript.Sphere
     
             return _attachableFaces;
         }
+        
     }
 }

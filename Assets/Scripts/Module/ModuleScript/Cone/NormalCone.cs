@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Module.ModuleScript.Cone
 {
-    public class NormalCone : BaseModule
+    public abstract class NormalCone : BaseAttackModule
     {
         protected override void Awake()
         {

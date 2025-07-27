@@ -15,10 +15,10 @@ GameObject:
   - component: {fileID: 1618972068852645751}
   - component: {fileID: 5313460344265381393}
   - component: {fileID: 6320824659470896910}
-  - component: {fileID: 4897596889960805533}
   - component: {fileID: 2891508519027555096}
+  - component: {fileID: 8241584203386379252}
   m_Layer: 7
-  m_Name: Cone
+  m_Name: Volcano
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1186,7 +1186,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c22777d6e868e4f2fb421913386b154e, type: 2}
+  - {fileID: 2100000, guid: 7408c9f0b0904c444bbcb4161841158d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1265,23 +1265,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4897596889960805533
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3978922820131464589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d07e2f4dda87a14397f6b4fdbb92ebe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moduleType: 0
-  moduleMass: 1
-  parentModule: {fileID: 0}
-  childModules: []
-  socketsList: []
 --- !u!65 &2891508519027555096
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1303,3 +1286,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8241584203386379252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3978922820131464589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32b1958a5aa04ea4295df00a3cd3a639, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moduleType: 0
+  moduleMass: 1
+  parentModule: {fileID: 0}
+  _childModules: []
+  _bulletPrefab: {fileID: 6791577315373995876, guid: 81bec6c79aebf304b9742f2024543e79, type: 3}
+  _firePoint: {fileID: 0}
