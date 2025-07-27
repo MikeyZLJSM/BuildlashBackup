@@ -10,26 +10,34 @@ namespace Module.Battle
     [Serializable]
     public class AttackParameters
     {
-        [SerializeField] public TargetLockType targetLockType = TargetLockType.Nearest;
-        [SerializeField] public int bulletCount = 1;
-        [SerializeField] public int targetCount = 1;
-        [SerializeField] public DamageType damageType = DamageType.Physical;
-        [SerializeField] public AttackAttribute attackAttribute = AttackAttribute.None;
-        [SerializeField] public int damage = 10;
-        [SerializeField] public float attackSpeed = 1.0f;
-        [SerializeField] public float attackRange = 5.0f;
-        [SerializeField] public float attackCD;
-        [SerializeField] public bool canAttack;
-        [SerializeField] public float bulletSpeed = 10.0f;
-        [SerializeField] public GameObject bulletPrefab;
+        public TargetLockType targetLockType = TargetLockType.Nearest;
+        public int bulletCount = 1;
+        public int targetCount = 1;
+        public DamageType damageType = DamageType.Physical;
+        public AttackAttribute attackAttribute = AttackAttribute.None;
+        public int damage = 10;
+        public float attackSpeed = 1.0f;
+        public float attackRange = 10.0f;
+        public float attackCD;
+        public bool canAttack;
+        public float bulletSpeed = 10.0f;
+        public GameObject bulletPrefab;
         
-        // 溅射半径（仅在溅射攻击时有效）
-        [SerializeField] private float splashRadius;
+        // 溅射半径（溅射攻击时有效）
+        private float splashRadius;
+        // 伤害频率 （持续攻击时有效）
+        private float tickInterval;
         
         public float SplashRadius
         {
             get => attackAttribute == AttackAttribute.Splash ? splashRadius : 0;
             set => splashRadius = value;
+        }
+        
+        public float TickInterval
+        {
+            get => attackAttribute == AttackAttribute.Continuous ? tickInterval : 0;
+            set => tickInterval = value;
         }
         
         /// <summary>

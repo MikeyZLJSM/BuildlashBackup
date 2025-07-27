@@ -29,7 +29,6 @@ namespace Module.Battle
                 Debug.LogWarning("溅射半径未设置，使用默认值3");
             }
             
-            // 获取命中点
             Vector3 impactPoint = context.impactPoint;
             
             // 创建溅射效果可视化
