@@ -4,8 +4,8 @@ using System.Data;
 using System.IO;
 using System.Reflection;
 using ExcelDataReader;
+using Module.Battle;
 using UnityEngine;
-using ModuleParameters = Module.Battle.ModuleParameters;
 
 namespace Module.Config
 {
@@ -16,11 +16,11 @@ namespace Module.Config
         private string _filePath;
         private string _sheetName;
         
-        private Dictionary<string, ModuleParameters> _moduleConfigs; // 使用模块类名作为键
+        private Dictionary<string, AttackParameters> _moduleConfigs; // 使用模块类名作为键
         private Dictionary<string, int> _columnIndices; // 列名到索引的映射
         private string[] _requiredColumns; // 必需的列名数组
         private Dictionary<string, string> _fieldToColumnMapping; // 字段名到列名的映射
-        private ModuleParameters _defaultConfig; // 缓存默认配置以避免重复创建
+        private AttackParameters _defaultConfig; // 缓存默认配置以避免重复创建
 
 
 
@@ -36,14 +36,14 @@ namespace Module.Config
         ///<summary>根据模块类名获取配置</summary>
         ///<param name="moduleName">模块名称</param>
         ///<returns>模块配置文件</returns>
-        public ModuleParameters GetModuleConfig(string moduleName)
+        public AttackParameters GetModuleConfig(string moduleName)
         {
             if (_moduleConfigs == null)
             {
                 LoadConfigs();
             }
 
-            if (_moduleConfigs != null && _moduleConfigs.TryGetValue(moduleName, out ModuleParameters config))
+            if (_moduleConfigs != null && _moduleConfigs.TryGetValue(moduleName, out AttackParameters config))
                 return config;
             
             Debug.LogWarning($"未找到模块配置: {moduleName ?? "null"}");
@@ -53,7 +53,7 @@ namespace Module.Config
         ///<summary>根据模块对象获取配置</summary>
         ///<param name="module">模块</param>
         ///<returns>模块配置文件</returns>
-        public ModuleParameters GetModuleConfig(BaseModule module)
+        public AttackParameters GetModuleConfig(BaseModule module)
         {
             if (module == null)
             {
@@ -71,7 +71,7 @@ namespace Module.Config
             // 初始化必需的列名
             InitializeRequiredColumns();
             
-            _moduleConfigs = new Dictionary<string, ModuleParameters>();
+            _moduleConfigs = new Dictionary<string, AttackParameters>();
             _columnIndices = new Dictionary<string, int>();
             
             // 使用Path.Combine确保路径分隔符正确
@@ -150,7 +150,7 @@ namespace Module.Config
                 
                 try
                 {
-                    ModuleParameters config = ParseModuleConfig(row); // 解析单个模块配置
+                    AttackParameters config = ParseModuleConfig(row); // 解析单个模块配置
                     if (config != null && !string.IsNullOrEmpty(config.moduleName)) // 确保模块名称不为空
                     {
                         _moduleConfigs[config.moduleName] = config;
@@ -234,7 +234,7 @@ namespace Module.Config
             _fieldToColumnMapping = new Dictionary<string, string>();
 
             // 获取所有公共字段
-            FieldInfo[] fields = typeof(ModuleParameters).GetFields(BindingFlags.Public | BindingFlags.Instance);
+            FieldInfo[] fields = typeof(AttackParameters).GetFields(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (FieldInfo field in fields)
             {
@@ -261,7 +261,7 @@ namespace Module.Config
         }
         
         ///<summary>使用反射动态设置字段值</summary>
-        private void SetFieldValue(ModuleParameters config, string fieldName, object value, Type fieldType)
+        private void SetFieldValue(AttackParameters config, string fieldName, object value, Type fieldType)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return;
@@ -273,25 +273,25 @@ namespace Module.Config
                 {
                     if (int.TryParse(value.ToString(), out int intValue))
                     {
-                        typeof(ModuleParameters).GetField(fieldName)?.SetValue(config, intValue);
+                        typeof(AttackParameters).GetField(fieldName)?.SetValue(config, intValue);
                     }
                 }
                 else if (fieldType == typeof(float))
                 {
                     if (float.TryParse(value.ToString(), out float floatValue))
                     {
-                        typeof(ModuleParameters).GetField(fieldName)?.SetValue(config, floatValue);
+                        typeof(AttackParameters).GetField(fieldName)?.SetValue(config, floatValue);
                     }
                 }
                 else if (fieldType == typeof(string))
                 {
-                    typeof(ModuleParameters).GetField(fieldName)?.SetValue(config, value.ToString());
+                    typeof(AttackParameters).GetField(fieldName)?.SetValue(config, value.ToString());
                 }
                 else if (fieldType.IsEnum)
                 {
                     if (Enum.TryParse(fieldType, value.ToString(), out object enumValue))
                     {
-                        typeof(ModuleParameters).GetField(fieldName)?.SetValue(config, enumValue);
+                        typeof(AttackParameters).GetField(fieldName)?.SetValue(config, enumValue);
                     }
                 }
                 else
@@ -306,10 +306,10 @@ namespace Module.Config
         }
 
         ///<summary>解析单个模块配置</summary>
-        private ModuleParameters ParseModuleConfig(DataRow row)
+        private AttackParameters ParseModuleConfig(DataRow row)
         {
-            ModuleParameters config = new ModuleParameters();
-            Type moduleParametersType = typeof(ModuleParameters);
+            AttackParameters config = new AttackParameters();
+            Type moduleParametersType = typeof(AttackParameters);
 
             // 处理所有字段
             FieldInfo[] fields = moduleParametersType.GetFields(BindingFlags.Public | BindingFlags.Instance);
@@ -337,8 +337,8 @@ namespace Module.Config
         ///<summary>加载默认配置</summary>
         private void LoadDefaultConfigs()
         {
-            _defaultConfig = new ModuleParameters();
-            _moduleConfigs = new Dictionary<string, ModuleParameters>
+            _defaultConfig = new AttackParameters();
+            _moduleConfigs = new Dictionary<string, AttackParameters>
             {
                 { _defaultConfig.moduleName, _defaultConfig }
             };
@@ -346,11 +346,11 @@ namespace Module.Config
         }
         
         ///<summary>获取默认配置</summary>
-        private ModuleParameters GetDefaultConfigs()
+        private AttackParameters GetDefaultConfigs()
         {
             if (_defaultConfig == null)
             {
-                _defaultConfig = new ModuleParameters();
+                _defaultConfig = new AttackParameters();
             }
             return _defaultConfig;
         }

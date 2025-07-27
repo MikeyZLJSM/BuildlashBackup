@@ -9,7 +9,7 @@ namespace Module.Interfaces
         bool CanAttack();
         void StartAttackCD();
         List<GameObject> GetTargetsInRange();
-        ModuleParameters GetAttackParameters();
+        AttackParameters GetAttackParameters();
         void ExecuteAttack(GameObject target);
     }
 }

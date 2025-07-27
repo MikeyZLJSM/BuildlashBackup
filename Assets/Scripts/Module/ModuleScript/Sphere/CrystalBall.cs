@@ -13,14 +13,14 @@ namespace Module.ModuleScript.Sphere
         [SerializeField] private GameObject _bulletPrefab; // 子弹预制体
         [SerializeField] private Transform _firePoint; // 发射点
         [SerializeField]
-        private ModuleParameters _modifiedModuleParameters;
+        private AttackParameters modifiedAttackParameters;
         
         protected override void Awake()
         {
             base.Awake();
             
             // 初始化攻击参数
-            moduleParameters = new ModuleParameters
+            attackParameters = new AttackParameters
             {
                 targetLockType = TargetLockType.Nearest,
                 bulletCount = 2,
@@ -48,7 +48,7 @@ namespace Module.ModuleScript.Sphere
         public void StartAttackCD()
         {
             canAttack = false;
-            attackCd = 1f / moduleParameters.attackSpeed;
+            attackCd = 1f / attackParameters.attackSpeed;
         }
 
         public List<GameObject> GetTargetsInRange()
@@ -74,10 +74,10 @@ namespace Module.ModuleScript.Sphere
             return targets;
         }
         
-        public ModuleParameters GetAttackParameters()
+        public AttackParameters GetAttackParameters()
         {
             // 返回攻击参数的副本，以防被修改
-            return moduleParameters.Clone();
+            return attackParameters.Clone();
         }
         
         public void ExecuteAttack(GameObject target)

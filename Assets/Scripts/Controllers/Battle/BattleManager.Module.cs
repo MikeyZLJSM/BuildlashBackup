@@ -71,8 +71,8 @@ namespace Controllers.Battle
             }
 
             // 获取原始攻击参数
-            ModuleParameters parameters = attackable.GetAttackParameters();
-            ModuleParameters newParameters = AttackModifier(parameters);
+            AttackParameters parameters = attackable.GetAttackParameters();
+            AttackParameters newParameters = AttackModifier(parameters);
             
             // 获取攻击范围内的目标
             List<GameObject> targets = attackable.GetTargetsInRange();
@@ -108,7 +108,7 @@ namespace Controllers.Battle
         }
         
 
-        private ModuleParameters AttackModifier(ModuleParameters  parameters)
+        private AttackParameters AttackModifier(AttackParameters  parameters)
         {
             return parameters;
         }

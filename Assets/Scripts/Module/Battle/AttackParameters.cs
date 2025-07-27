@@ -8,7 +8,7 @@ namespace Module.Battle
     /// 战斗参数类，封装所有战斗相关参数
     /// </summary>
     [Serializable]
-    public class ModuleParameters
+    public class AttackParameters
     {
         /// <summary>模块名称</summary>
         [SerializeField] public string moduleName = "DefaultModule";
@@ -47,9 +47,9 @@ namespace Module.Battle
         /// <summary>
         /// 创建攻击参数的副本
         /// </summary>
-        public ModuleParameters Clone()
+        public AttackParameters Clone()
         {
-            return new ModuleParameters
+            return new AttackParameters
             {
                 targetLockType = this.targetLockType,
                 bulletCount = this.bulletCount,

@@ -80,7 +80,7 @@ namespace Controllers
         
         
         ///<summary>根据模块类名获取配置</summary>
-        public ModuleParameters GetModuleConfig(string moduleName)
+        public AttackParameters GetModuleConfig(string moduleName)
         {
             if (string.IsNullOrEmpty(moduleName))
             {
@@ -97,7 +97,7 @@ namespace Controllers
         }
         
         ///<summary>根据模块对象获取配置</summary>
-        public ModuleParameters GetModuleConfig(BaseModule module)
+        public AttackParameters GetModuleConfig(BaseModule module)
         {
             if (module == null)
             {
@@ -122,7 +122,7 @@ namespace Controllers
                 return false;
             }
             
-            ModuleParameters config = GetModuleConfig(module);
+            AttackParameters config = GetModuleConfig(module);
             if (config != null)
             {
                 // 由于BaseModule可能没有统一的ApplyConfig方法
