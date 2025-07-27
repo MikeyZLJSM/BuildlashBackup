@@ -181,7 +181,7 @@ namespace Controllers
 
             // 应用半透明材质
             Renderer[] renderers = _previewObject.GetComponentsInChildren<Renderer>();
-            foreach (var renderer in renderers)
+            foreach (Renderer renderer in renderers)
             {
                 Material[] materials = new Material[renderer.materials.Length];
                 for (int i = 0; i < materials.Length; i++)
@@ -258,7 +258,7 @@ namespace Controllers
                 {
                     Vector3 targetNormal = hit.normal; // 父模块被点击面的法线
                     
-                    var faces = targetModule._attachableFaces;
+                    ModuleFace[] faces = targetModule._attachableFaces;
                     
                     if(!IsHitFaceAttachable(hit.normal, faces)) return;
                     
@@ -303,12 +303,12 @@ namespace Controllers
         {
             targetFaceNormal = Vector3.zero;
             targetFaceCenter = Vector3.zero;
-            var targetAttach = targetModule as IAttachable;
+            IAttachable targetAttach = targetModule as IAttachable;
             if (targetAttach == null)
                 return false;
             Vector3 hitNormal = hit.normal;
             
-            var targetFaces = targetModule._attachableFaces;
+            ModuleFace[] targetFaces = targetModule._attachableFaces;
             
             if(IsHitFaceAttachable(hit.normal, targetFaces) == false) return false;
             
@@ -323,10 +323,10 @@ namespace Controllers
         // 查找选中模块上最适合与目标面拼接的面
         private bool TryFindSourceAttachableFaceIndex(BaseModule selectedModule, Vector3 hitPoint)
         {
-            var selectedAttach = selectedModule as IAttachable;
+            IAttachable selectedAttach = selectedModule as IAttachable;
             if (selectedAttach == null)
                 return false;
-            var selectedFaces = selectedModule._attachableFaces;
+            ModuleFace[] selectedFaces = selectedModule._attachableFaces;
             int bestSelectedFaceIdx = -1;
             float minDist = float.MaxValue;
             

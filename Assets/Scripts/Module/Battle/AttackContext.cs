@@ -12,11 +12,11 @@ namespace Module.Battle
         
         public GameObject target;
         
-        public AttackParameters parameters;
+        public ModuleParameters parameters;
         
         public Vector3 impactPoint;
         
-        public AttackContext(BaseModule sourceModule, GameObject target, AttackParameters parameters)
+        public AttackContext(BaseModule sourceModule, GameObject target, ModuleParameters parameters)
         {
             this.sourceModule = sourceModule;
             this.target = target;

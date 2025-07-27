@@ -16,10 +16,10 @@ namespace Controllers.Battle
         public void InitializeModuleBattleSystem()
         {
             // 从ModulesManager获取所有已组装的模块
-            var moduleInfos = ModulesManager.Instance.GetAllModulesInfo();
+            List<ModulesManager.ModuleInfo> moduleInfos = ModulesManager.Instance.GetAllModulesInfo();
             _battleModules.Clear();
             
-            foreach (var moduleInfo in moduleInfos)
+            foreach (ModulesManager.ModuleInfo moduleInfo in moduleInfos)
             {
                 if (moduleInfo.module != null && moduleInfo.isAttackModule)
                 {
@@ -33,13 +33,13 @@ namespace Controllers.Battle
         // 更新所有模块的战斗逻辑
         private void UpdateModuleBattleLogic()
         {
-            foreach (var module in _battleModules)
+            foreach (BaseModule module in _battleModules)
             {
                 UpdateModuleCD(module);
             }
             
             // 处理攻击模块的逻辑
-            foreach (var module in _battleModules)
+            foreach (BaseModule module in _battleModules)
             {
                 if (module is IAttackable attackable)
                 {
@@ -51,12 +51,12 @@ namespace Controllers.Battle
         // 更新模块冷却时间
         private void UpdateModuleCD(BaseModule module)
         {
-            if (module._attackCD >= 0)
+            if (module.attackCd >= 0)
             {
-                module._attackCD -= Time.deltaTime;
-                if (module._attackCD <= 0)
+                module.attackCd -= Time.deltaTime;
+                if (module.attackCd <= 0)
                 {
-                    module._canAttack = true;
+                    module.canAttack = true;
                 }
             }
         }
@@ -71,8 +71,8 @@ namespace Controllers.Battle
             }
 
             // 获取原始攻击参数
-            AttackParameters parameters = attackable.GetAttackParameters();
-            var newParameters = AttackModifier(parameters);
+            ModuleParameters parameters = attackable.GetAttackParameters();
+            ModuleParameters newParameters = AttackModifier(parameters);
             
             // 获取攻击范围内的目标
             List<GameObject> targets = attackable.GetTargetsInRange();
@@ -89,7 +89,7 @@ namespace Controllers.Battle
             {
                 if (targets.Count < parameters.targetCount)
                 {
-                    foreach (var target in targets)
+                    foreach (GameObject target in targets)
                     {
                         attackable.ExecuteAttack(target);
                     }
@@ -108,7 +108,7 @@ namespace Controllers.Battle
         }
         
 
-        private AttackParameters AttackModifier(AttackParameters  parameters)
+        private ModuleParameters AttackModifier(ModuleParameters  parameters)
         {
             return parameters;
         }

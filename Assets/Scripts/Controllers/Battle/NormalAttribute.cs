@@ -13,7 +13,7 @@ namespace Controllers.Battle
         public void ApplyAttribute(AttackContext context)
         {
             // 获取目标敌人
-            if (context.target && context.target.TryGetComponent<BaseEnemy>(out var enemy))
+            if (context.target && context.target.TryGetComponent<BaseEnemy>(out BaseEnemy enemy))
             {
                 // 直接造成伤害
                 enemy.TakeDamage(context.parameters.damage);

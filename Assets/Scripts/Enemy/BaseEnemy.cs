@@ -98,7 +98,7 @@ namespace Enemy
         {
             if (AttackStrategy != null)
             {
-                var target = MovementStrategy?.GetTarget();
+                Transform target = MovementStrategy?.GetTarget();
                 if (target != null && Time.time - _lastAttackTime >= attackCooldown && AttackStrategy.Attack(transform, target, attackPower))
                 {
                     _lastAttackTime = Time.time; // 更新最后攻击时间
@@ -184,7 +184,7 @@ namespace Enemy
             switch (movementType)
             {
                 case MovementType.Straight:
-                    var straightMovement = new StraightMovement();
+                    StraightMovement straightMovement = new StraightMovement();
                     straightMovement.SetAttackRange(attackRange); // 设置攻击范围
                     SetMovementStrategy(straightMovement);
                     break;

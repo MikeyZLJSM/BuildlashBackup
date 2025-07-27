@@ -42,8 +42,8 @@ namespace Controllers
         //摄像机的旋转
         public void Cam_Ctrl_Rotation()
         {
-            var mouse_x = Input.GetAxis("Mouse X"); //获取鼠标X轴移动
-            var mouse_y = -Input.GetAxis("Mouse Y"); //获取鼠标Y轴移动
+            float mouse_x = Input.GetAxis("Mouse X"); //获取鼠标X轴移动
+            float mouse_y = -Input.GetAxis("Mouse Y"); //获取鼠标Y轴移动
             if (Input.GetKey(KeyCode.Mouse1))
             {
                 transform.RotateAround(_rotionTransform, Vector3.up, mouse_x * rotationSpeed);

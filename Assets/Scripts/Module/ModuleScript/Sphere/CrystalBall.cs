@@ -12,15 +12,15 @@ namespace Module.ModuleScript.Sphere
         [SerializeField] private float _attackRange = 5f;
         [SerializeField] private GameObject _bulletPrefab; // 子弹预制体
         [SerializeField] private Transform _firePoint; // 发射点
-        
-        private AttackParameters _modifiedAttackParameters;
+        [SerializeField]
+        private ModuleParameters _modifiedModuleParameters;
         
         protected override void Awake()
         {
             base.Awake();
             
             // 初始化攻击参数
-            _attackParameters = new AttackParameters
+            moduleParameters = new ModuleParameters
             {
                 targetLockType = TargetLockType.Nearest,
                 bulletCount = 2,
@@ -29,7 +29,6 @@ namespace Module.ModuleScript.Sphere
                 attackAttribute = AttackAttribute.None,
                 damage = 8,
                 attackSpeed = 1.0f,
-                attackRange = _attackRange,
                 bulletSpeed = 10f,
                 bulletPrefab = _bulletPrefab
             };
@@ -43,13 +42,13 @@ namespace Module.ModuleScript.Sphere
         
         public bool CanAttack()
         {
-            return _canAttack;
+            return canAttack;
         }
 
         public void StartAttackCD()
         {
-            _canAttack = false;
-            _attackCD = 1f / _attackParameters.attackSpeed;
+            canAttack = false;
+            attackCd = 1f / moduleParameters.attackSpeed;
         }
 
         public List<GameObject> GetTargetsInRange()
@@ -64,7 +63,7 @@ namespace Module.ModuleScript.Sphere
             );
             
             // 添加找到的敌人到目标列表
-            foreach (var enemyCollider in colliders)
+            foreach (Collider enemyCollider in colliders)
             {
                 if (enemyCollider.TryGetComponent<BaseEnemy>(out _))
                 {
@@ -75,10 +74,10 @@ namespace Module.ModuleScript.Sphere
             return targets;
         }
         
-        public AttackParameters GetAttackParameters()
+        public ModuleParameters GetAttackParameters()
         {
             // 返回攻击参数的副本，以防被修改
-            return _attackParameters.Clone();
+            return moduleParameters.Clone();
         }
         
         public void ExecuteAttack(GameObject target)

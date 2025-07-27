@@ -1,16 +1,16 @@
 ﻿using System;
 using Module.Battle;
 using Module.Enums;
+using UnityEngine;
 
 namespace Module
 {
     public abstract partial class BaseModule
     {
-        /// <summary>生命值</summary>
-        [NonSerialized] public int _health = 100;
-        // 攻击参数
-        public AttackParameters _attackParameters;
-        public float _attackCD;
-        public bool _canAttack;
+        // 战斗参数
+        [SerializeField]public ModuleParameters moduleParameters;
+        
+        [SerializeField] public float attackCd = 1.0f; 
+        [SerializeField] public bool canAttack = true;
     }
 }

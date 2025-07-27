@@ -1,5 +1,6 @@
 ﻿using Controllers.Battle;
 using Enemy.Interfaces;
+using Module;
 using UnityEngine;
 
 namespace Enemy.AttackStrategies
@@ -16,7 +17,7 @@ namespace Enemy.AttackStrategies
             if (!CanAttack(attacker, target)) return false;
             
             // 检查目标是否有BaseModule组件（假设这是攻击目标）
-            var targetModule = target.GetComponent<Module.BaseModule>();
+            BaseModule targetModule = target.GetComponent<Module.BaseModule>();
             if (targetModule != null)
             {
                 // 通过BattleManager处理伤害
