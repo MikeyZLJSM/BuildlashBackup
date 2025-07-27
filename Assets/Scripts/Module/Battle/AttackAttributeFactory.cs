@@ -15,6 +15,12 @@ namespace Module.Battle
                 case AttackAttribute.None:
                     return new NormalAttribute();
                 
+                case AttackAttribute.Splash:
+                    return new SplashAttribute();
+                
+                case AttackAttribute.Continuous:
+                    return new ContinuousAttribute();
+                
                 default:
                     return new NormalAttribute();
             }

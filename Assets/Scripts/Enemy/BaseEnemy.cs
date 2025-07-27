@@ -155,7 +155,7 @@ namespace Enemy
             {
                 Die();
             }
-            Debug.Log($"{name}受到伤害: {damage}, 剩余血量: {health}");
+            //Debug.Log($"{name}受到伤害: {damage}, 剩余血量: {health}");
         }
 
         /// <summary> 死亡方法 </summary>

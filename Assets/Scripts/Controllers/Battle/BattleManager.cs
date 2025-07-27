@@ -30,6 +30,8 @@ namespace Controllers.Battle
             PlayerCurrentHealth = PlayerMaxHealth;
             UIController.Instance.UpdateHealthText(PlayerCurrentHealth,PlayerMaxHealth );
             
+            Bullet.OnBulletHit += HandleBulletHit;
+            
             InitializeModuleBattleSystem();
         }
 
@@ -83,6 +85,8 @@ namespace Controllers.Battle
         public void OnDisable()
         {
             ClearAllEnemies();
+            
+            Bullet.OnBulletHit -= HandleBulletHit;
         }
     }
 }
