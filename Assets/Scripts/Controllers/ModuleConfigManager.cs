@@ -12,7 +12,7 @@ namespace Controllers
         [Header("Excel表格名称")]
         public static string SheetName = "配置表"; // Excel表格名称
         [Header("配置文件路径")]
-        public static string ConfigFilePath = "/Config/数值表.xlsx"; 
+        public static string ConfigFilePath = "/Config/数值表.xls"; 
         
         public static ModuleConfigManager Instance { get; private set; }
 
@@ -31,7 +31,6 @@ namespace Controllers
             }
             
             Instance = this;
-            DontDestroyOnLoad(gameObject);
             
  
         }
@@ -113,29 +112,6 @@ namespace Controllers
             return _excelReader.GetModuleConfig(module);
         }
         
-        ///<summary>应用配置到模块</summary>
-        public bool ApplyConfigToModule(BaseModule module)
-        {
-            if (module == null)
-            {
-                Debug.LogWarning("模块对象为null，无法应用配置");
-                return false;
-            }
-            
-            AttackParameters config = GetModuleConfig(module);
-            if (config != null)
-            {
-                // 由于BaseModule可能没有统一的ApplyConfig方法
-                // 这里返回true表示成功获取到配置，具体应用由调用者处理
-                Debug.Log($"成功获取模块配置: {module.GetType().Name}");
-                return true;
-            }
-            else
-            {
-                Debug.LogWarning($"未找到模块 {module.GetType().Name} 的配置");
-                return false;
-            }
-        }
         
         ///<summary>确保管理器已初始化</summary>
         private bool EnsureInitialized()

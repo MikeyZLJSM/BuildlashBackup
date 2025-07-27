@@ -49,7 +49,7 @@ namespace Controllers.Battle
             PlayerMaxHealth = 0f;
             foreach( ModulesManager.ModuleInfo moduleInfo in  ModulesManager.Instance.GetAllModulesInfo())
             {
-                PlayerMaxHealth += moduleInfo.module.attackParameters.health;
+                PlayerMaxHealth += moduleInfo.module._health;
             }
             return PlayerMaxHealth;
         }

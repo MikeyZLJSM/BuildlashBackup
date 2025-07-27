@@ -315,7 +315,7 @@ namespace Module.Config
             FieldInfo[] fields = moduleParametersType.GetFields(BindingFlags.Public | BindingFlags.Instance);
             foreach (FieldInfo field in fields)
             {
-                if (field.Name == "bulletPrefab") // 跳过GameObject字段
+                if (field.Name == "bulletPrefab"|| field.Name == "") // 跳过GameObject字段
                     continue;
 
                 if (_fieldToColumnMapping.TryGetValue(field.Name, out string columnName))
